@@ -1,0 +1,13 @@
+.c-slice{
+  position: absolute;
+  background:rgba(255, 255, 255, 0.5);
+  text-align: center;
+  //take up the entire slice
+  width: 100%;
+  //rotate the slice around the right axis
+  transform-origin: center left;
+  // //center vertically
+  // transform: translate(0%, -50%);
+  top: -12px;
+
+}
