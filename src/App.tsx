@@ -4,10 +4,14 @@
 import './App.css'
 import { Wheel } from './components/wheel/wheel'
 const sliceData = [
-  { id: 0, text: 'slice 1', weight: 1 },
-  { id: 1, text: 'slice 2', weight: 1 },
-  { id: 2, text: 'slice 3', weight: 1 },
-  { id: 3, text: 'slice 4', weight: 1 },
+  { id: 0, text: 'end stream', weight: 1 },
+  { id: 1, text: 'play valorant', weight: 1 },
+  { id: 2, text: 'cry ', weight: 1 },
+  { id: 3, text: 'eat spicy chip', weight: 1 },
+  { id: 4, text: 'jumping jacks', weight: 2 },
+  { id: 5, text: '100 pushups', weight: 0.1 },
+
+
 ]
 function App() {
 

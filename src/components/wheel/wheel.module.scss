@@ -5,7 +5,7 @@
   //width and height should be the same
   aspect-ratio: 1 / 1;
   border-radius: 50%;
-  background: blue;
+  // background: blue;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,7 +18,8 @@
   }
   //apply the spinning op
   
-  animation: spin 4s linear infinite;
+  // animation: spin 4s linear infinite;
+
 }
 
 
