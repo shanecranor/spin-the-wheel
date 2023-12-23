@@ -4,7 +4,7 @@ export function buildWheelOffsets(sliceData: SliceData[]) {
   const totalSliceWeight = sliceData.reduce((acc, slice) => acc + slice.weight, 0)
   const sliceWeights = sliceData.map(slice => slice.weight / totalSliceWeight)
   const gradient = sliceWeights.map((weight, idx) => {
-    const color = ["red", "green", "blue", "orange", "purple", "black"][idx % 6]
+    const color = ["#746EE0", "#7FC9F3", "#81E27F", "#EB55AA", "#F2982C", "#FADD81"][idx % 6]
     const start = (sliceWeights.slice(0, idx).reduce((acc, weight) => acc + weight, 0))
     const end = (start + weight)
     const mid = (start + end) / 2

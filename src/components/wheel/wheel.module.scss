@@ -1,10 +1,12 @@
 .c-wheel{
+  box-sizing: border-box;
   //make a big ole circluar
   width: 100%;
   height: 100%;
   //width and height should be the same
   aspect-ratio: 1 / 1;
   border-radius: 50%;
+  border: 16px solid white;
   // background: blue;
   display: flex;
   justify-content: center;

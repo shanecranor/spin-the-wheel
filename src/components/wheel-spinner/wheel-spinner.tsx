@@ -4,10 +4,10 @@ import { Wheel } from "../wheel/wheel";
 import { observer } from "@legendapp/state/react";
 import { wheelState$ } from "./wheel-state";
 import { buildWheelOffsets } from "../wheel/wheel-svg-generator";
-
+import styles from "./wheel-spinner.module.scss";
 export const WheelSpinner = observer(({ initialSliceData }: { initialSliceData: SliceData[] }) => {
   wheelState$.sliceData.set(initialSliceData);
-  return <div className="wheel-spinner">
+  return <div className={styles["c-wheel-spinner"]}>
     <Wheel sliceData={wheelState$.sliceData.get()} rotation={wheelState$.rotation.get()} />
     <button onClick={() => doSpin()}>Spin me</button>
   </div>;
