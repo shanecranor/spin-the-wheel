@@ -1,10 +1,10 @@
 // import { useState } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
-import './App.css'
+import './App.scss'
 import { EntryManager } from './components/entry-manager/entry-manager'
 import { WheelSpinner } from './components/wheel-spinner/wheel-spinner'
-import { tempSliceData } from './components/wheel/temp-data'
+
 function App() {
 
   return (
@@ -12,7 +12,7 @@ function App() {
 
       <div className='wheel'>
         <h1>Spin the Wheel</h1>
-        <WheelSpinner initialSliceData={tempSliceData} />
+        <WheelSpinner initialSliceData={[]} />
         <div className='wheel-controls'>
           <button>Open Submissions</button>
           <button>Close Submissions</button>
@@ -26,6 +26,7 @@ function App() {
           </div>
         </div>
       </div>
+
       <aside className='wheel-items'>
         {/* open close menu button (autohide once playing?) */}
         <EntryManager />

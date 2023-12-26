@@ -1,0 +1,31 @@
+.c-entry-card{
+  padding: 8px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 4px;
+  display: flex;
+  >.text-container{
+    text-align: left;
+    flex-grow: 1;
+    >.entry-text{
+      font-size: 24px;
+    }
+  }
+  >.entry-controls{
+    display:flex;
+    align-items: center;
+    >.delete-button{
+      font-family: monospace;
+      all: unset;
+      width: 30px;
+      height: 30px;
+    }
+    >.is-on-wheel{
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      &:checked{
+        background-color: #6BBE56;
+      }
+    }
+  }
+}

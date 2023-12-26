@@ -13,11 +13,11 @@ export const EntryCard = ({ text, author, isOnWheel, onAccept, onRemove, onDelet
     <div className={styles["c-entry-card"]}>
       <div className={styles["text-container"]}>
         <div className={styles["entry-text"]}>{text}</div>
-        <div className={styles["entry-author"]}>{author}</div>
+        <div className={styles["entry-author"]}>submitted by {author}</div>
       </div>
       <div className={styles["entry-controls"]}>
         {/* lets make a checkbox here for accept and remove */}
-        <input className={styles["on-wheel"]} type="checkbox" checked={isOnWheel} onChange={(e) => {
+        <input className={styles["is-on-wheel"]} type="checkbox" checked={isOnWheel} onChange={(e) => {
           if (e.target.value) {
             onAccept()
           } else {
@@ -25,7 +25,7 @@ export const EntryCard = ({ text, author, isOnWheel, onAccept, onRemove, onDelet
           }
         }} />
         <button className={styles["delete-button"]} onClick={() => onDelete()}>
-          Delete Entry
+          X
         </button>
       </div>
     </div>

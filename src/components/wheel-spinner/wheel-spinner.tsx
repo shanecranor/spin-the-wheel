@@ -6,7 +6,9 @@ import { wheelState$ } from "./wheel-state";
 import { buildWheelOffsets } from "../wheel/wheel-svg-generator";
 import styles from "./wheel-spinner.module.scss";
 export const WheelSpinner = observer(({ initialSliceData }: { initialSliceData: SliceData[] }) => {
-  wheelState$.sliceData.set(initialSliceData);
+  if (wheelState$.sliceData.get().length === 0) {
+    wheelState$.sliceData.set(initialSliceData);
+  }
   return <div className={styles["c-wheel-spinner"]}>
     <Wheel sliceData={wheelState$.sliceData.get()} rotation={wheelState$.rotation.get()} />
     <button onClick={() => doSpin()}>Spin me</button>
@@ -15,7 +17,7 @@ export const WheelSpinner = observer(({ initialSliceData }: { initialSliceData: 
 
 function doSpin() {
   //fetch slice data
-  const sliceData = wheelState$.sliceData.get();
+  const sliceData = wheelState$.sliceData.peek();
   //choose a random slice to win
   const winnerIdx = Math.floor(Math.random() * sliceData.length);
   const winnerSlice = sliceData[winnerIdx];
@@ -27,6 +29,9 @@ function doSpin() {
   //set the rotation to the random angle
   const newAngle = wheelOffsets[idx].mid * 360 //getRandomFloat(wheelOffsets[idx].start, wheelOffsets[idx].end) * 360
   wheelState$.rotation.set((old) => old + (360 - old % 360) + newAngle + (Math.ceil(Math.random() * 3 + 2) * -360));
+  setTimeout(() => {
+    wheelState$.sliceData.set((old) => old.filter((item) => item.id != winnerSlice.id))
+  }, 5000)
 }
 
 

@@ -19,7 +19,7 @@ export const Wheel = observer(({ sliceData, rotation }: WheelProps) => {
         style={{
           background: backgroundImage,
           transform: `rotate(${rotation * -1}deg)`,
-          transition: 'transform 2s ease-in-out'
+          transition: 'transform 4s ease-out'
         }}>
         <div className={styles["slices-container"]}>
           {sliceData.map((slice, idx) => {
