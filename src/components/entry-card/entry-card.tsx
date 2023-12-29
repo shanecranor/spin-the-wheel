@@ -1,33 +1,33 @@
+import { Checkbox, CloseButton, Paper, Text } from "@mantine/core";
 import styles from "./entry-card.module.scss"
 export interface EntryCardProps {
   text: string;
   author: string;
   // isSafe: boolean; //mod approved
-  isOnWheel: boolean;
-  onAccept: () => void;
-  onRemove: () => void;
-  onDelete: () => void;
+  isOnWheel?: boolean;
+  onAccept?: () => void;
+  onRemove?: () => void;
+  onDelete?: () => void;
 }
-export const EntryCard = ({ text, author, isOnWheel, onAccept, onRemove, onDelete }: EntryCardProps) => {
+// TODO: remove placehold functions
+export const EntryCard = ({ text, author, isOnWheel = true, onAccept = () => (0), onRemove = () => (0), onDelete = () => (0) }: EntryCardProps) => {
   return (
-    <div className={styles["c-entry-card"]}>
-      <div className={styles["text-container"]}>
-        <div className={styles["entry-text"]}>{text}</div>
-        <div className={styles["entry-author"]}>submitted by {author}</div>
+    <Paper withBorder className={styles["c-entry-card"]}>
+      <div className={styles["entry-text"]}>
+        <Text size="lg" truncate="end">{text}</Text>
+        <Text size="xs" truncate="end">{author}</Text>
       </div>
       <div className={styles["entry-controls"]}>
         {/* lets make a checkbox here for accept and remove */}
-        <input className={styles["is-on-wheel"]} type="checkbox" checked={isOnWheel} onChange={(e) => {
+        <Checkbox color="green.5" size="lg" checked={isOnWheel} onChange={(e) => {
           if (e.target.value) {
             onAccept()
           } else {
             onRemove()
           }
         }} />
-        <button className={styles["delete-button"]} onClick={() => onDelete()}>
-          X
-        </button>
+        <CloseButton size="lg" aria-label="delete this entry" onClick={onDelete} />
       </div>
-    </div>
+    </Paper>
   )
 }

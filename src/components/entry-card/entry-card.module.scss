@@ -1,31 +1,23 @@
-.c-entry-card{
-  padding: 8px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 4px;
+.c-entry-card {
   display: flex;
-  >.text-container{
+  flex-direction: row;
+  gap: 8px;
+  padding: 4px;
+
+  >.entry-text{
+    margin-left: 8px;
+    padding-bottom: 4px;
     text-align: left;
     flex-grow: 1;
-    >.entry-text{
-      font-size: 24px;
-    }
   }
+
   >.entry-controls{
-    display:flex;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    >.delete-button{
-      font-family: monospace;
-      all: unset;
-      width: 30px;
-      height: 30px;
-    }
-    >.is-on-wheel{
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-      &:checked{
-        background-color: #6BBE56;
-      }
+    :global(.mantine-CloseButton-root) {
+      color: var(--mantine-color-red-3)
     }
   }
+
 }
