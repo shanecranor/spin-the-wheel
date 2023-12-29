@@ -1,4 +1,4 @@
-.c-wheel{
+.c-wheel {
   box-sizing: border-box;
   //make a big ole circluar
   width: 100%;
@@ -11,7 +11,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  .slices-container{
+  .slices-container {
     position: relative;
     //take up only half the circle
     width: 50%;
@@ -19,11 +19,9 @@
     transform: translate(50%, 0%);
   }
   //apply the spinning op
-  
+
   // animation: spin 0.2s linear infinite;
-
 }
-
 
 //create a temporary spinning animation
 @keyframes spin {

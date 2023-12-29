@@ -12,14 +12,14 @@
   filter: drop-shadow(0 0 2em #61dafbaa);
 } */
 
-main{
+main {
   display: flex;
-  flex-direction:row;
-  flex-wrap:wrap;
+  flex-direction: row;
+  flex-wrap: wrap;
   > .wheel {
     max-width: 50vw;
-    >.wheel-controls{
-      display:flex;
+    > .wheel-controls {
+      display: flex;
     }
   }
 }
