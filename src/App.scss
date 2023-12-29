@@ -1,23 +1,19 @@
 #root {
-  // max-width: 1280px;
+  width: 100%;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
   position: relative;
 }
-/* .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-} */
 
 main {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  display: grid;
+  justify-content: space-between;
+  grid-template-columns: 1fr auto;
   > .wheel {
-    max-width: 50vw;
+    flex-grow: 1;
+    max-width: 70vh;
     > .wheel-controls {
       display: flex;
     }

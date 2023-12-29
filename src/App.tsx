@@ -21,14 +21,14 @@ const App = observer(() => {
           <button>Close Submissions</button>
           <button>Settings</button>
           <div className="settings">
-            <button>import</button>
+            {/* <button>import</button>
             <button>export</button>
             <button>restore removed entries</button>
             <button>clear all submissions</button>
             <label>
               remove slice after spin?
               <input type="checkbox" />
-            </label>
+            </label> */}
           </div>
         </div>
       </div>

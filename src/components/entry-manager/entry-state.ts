@@ -6,6 +6,7 @@ export interface EntryProps {
   author: string;
   isSafe: boolean;
   isOnWheel: boolean;
+  isWinner?: boolean;
 }
 
 const tempEntryData: EntryProps[] = [
@@ -15,6 +16,7 @@ const tempEntryData: EntryProps[] = [
     author: "User123",
     isSafe: true,
     isOnWheel: true,
+    isWinner: true,
   },
   {
     id: 2,

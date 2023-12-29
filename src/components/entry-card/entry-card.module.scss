@@ -3,21 +3,33 @@
   flex-direction: row;
   gap: 8px;
   padding: 4px;
+  transition: all 0.2s ease-in-out;
+  //var(--mantine-color-green-3);
 
-  >.entry-text{
+  &:global(.on-wheel) {
+    box-shadow: 0 0 6px -3px var(--mantine-color-green-3);
+  }
+
+  &:global(.winner) {
+    box-shadow: 0 0 10px -2px var(--mantine-color-yellow-3),
+      0 0 50px -30px var(--mantine-color-yellow-3);
+    border: 1px solid var(--mantine-color-yellow-3);
+    background: color-mix(
+      in srgb,
+      var(--mantine-color-dark-8) 80%,
+      var(--mantine-color-yellow-3) 20%
+    );
+  }
+  > .entry-text {
     margin-left: 8px;
     padding-bottom: 4px;
     text-align: left;
     flex-grow: 1;
   }
 
-  >.entry-controls{
+  > .entry-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    :global(.mantine-CloseButton-root) {
-      color: var(--mantine-color-red-3)
-    }
   }
-
 }
