@@ -7,9 +7,20 @@ export const EntryManager = () => {
     <div className={styles["c-entry-manager"]}>
       <div className={styles["approved-entries"]}>
         {entryState$.get().map((entry) => {
-          // create the functions required for each card here :pog:
+          // create the functions required for each card here 
+          const toggleOnWheel = () => {
+            entryState$.set((old) => old.map((oldEntry) => {
+              if (oldEntry.id === entry.id) {
+                return {
+                  ...oldEntry,
+                  isOnWheel: !oldEntry.isOnWheel
+                }
+              }
+              return oldEntry
+            }))
+          }
 
-          return (<EntryCard text={entry.text} author={entry.author} />)
+          return (<EntryCard text={entry.text} author={entry.author} isOnWheel={entry.isOnWheel} toggleOnWheel={toggleOnWheel} />)
         })}
       </div>
 

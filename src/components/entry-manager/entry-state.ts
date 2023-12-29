@@ -6,7 +6,7 @@ export interface EntryProps {
   text: string;
   author: string;
   isSafe: boolean;
-  isSentToWheel: boolean;
+  isOnWheel: boolean;
 }
 
 const tempEntryData: EntryProps[] = [
@@ -15,42 +15,42 @@ const tempEntryData: EntryProps[] = [
     text: "end stream",
     author: "User123",
     isSafe: true,
-    isSentToWheel: true,
+    isOnWheel: true,
   },
   {
     id: 2,
     text: "play valorant",
     author: "GamerGalaxy",
     isSafe: true,
-    isSentToWheel: true,
+    isOnWheel: true,
   },
   {
     id: 3,
     text: "cry",
     author: "TearsOfJoy",
     isSafe: true,
-    isSentToWheel: true,
+    isOnWheel: true,
   },
   {
     id: 4,
     text: "eat spicy chip",
     author: "SpicyFanatic",
     isSafe: true, // Assuming it's generally safe
-    isSentToWheel: true,
+    isOnWheel: true,
   },
   {
     id: 5,
     text: "jumping jacks",
     author: "ActiveStreamer",
     isSafe: true,
-    isSentToWheel: true,
+    isOnWheel: true,
   },
   {
     id: 6,
     text: "100 pushups",
     author: "FitnessFreak",
     isSafe: true, // Assuming general fitness level of audience
-    isSentToWheel: true,
+    isOnWheel: true,
   },
 ];
 

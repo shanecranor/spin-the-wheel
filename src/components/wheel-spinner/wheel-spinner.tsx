@@ -5,10 +5,11 @@ import { observer } from "@legendapp/state/react";
 import { wheelState$ } from "./wheel-state";
 import { buildWheelOffsets } from "../wheel/wheel-svg-generator";
 import styles from "./wheel-spinner.module.scss";
-export const WheelSpinner = observer(({ initialSliceData }: { initialSliceData: SliceData[] }) => {
-  if (wheelState$.sliceData.get().length === 0) {
-    wheelState$.sliceData.set(initialSliceData);
-  }
+export const WheelSpinner = observer(({ slices }: { slices: SliceData[] }) => {
+  // TODO: PASS A FUNCTION FOR REMOVING SLICES FROM STATE TO CALL 
+  // if (wheelState$.sliceData.get().length === 0) {
+  wheelState$.sliceData.set(slices);
+  // }
   return <div className={styles["c-wheel-spinner"]}>
     <Wheel sliceData={wheelState$.sliceData.get()} rotation={wheelState$.rotation.get()} />
     <button onClick={() => doSpin()}>Spin me</button>

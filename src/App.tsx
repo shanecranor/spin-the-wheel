@@ -4,15 +4,16 @@
 import './App.scss'
 import { EntryManager } from './components/entry-manager/entry-manager'
 import { WheelSpinner } from './components/wheel-spinner/wheel-spinner'
-
-function App() {
+import { EntryProps, entryState$ } from './components/entry-manager/entry-state'
+import { observer } from '@legendapp/state/react'
+const App = observer(() => {
 
   return (
     <main>
 
       <div className='wheel'>
         <h1>Spin the Wheel</h1>
-        <WheelSpinner initialSliceData={[]} />
+        <WheelSpinner slices={getActiveSlices(entryState$.get())} />
         <div className='wheel-controls'>
           <button>Open Submissions</button>
           <button>Close Submissions</button>
@@ -33,6 +34,10 @@ function App() {
       </aside>
     </main>
   )
-}
+})
 
+function getActiveSlices(entries: EntryProps[]) {
+  const activeEntries = entries.filter((entry) => entry.isOnWheel).map((entry) => entry.text)
+  return activeEntries.map((entry) => ({ text: entry, color: 'green', weight: 1 }))
+}
 export default App

@@ -22,7 +22,7 @@ export const wheelState$ = observable<WheelState>({
   selectedItemId: null,
   isRotating: false,
   sliceData: entryState$.get().filter(
-    (entry) => entry.isSentToWheel
+    (entry) => entry.isOnWheel
   ).map((entry) => ({
     id: entry.id,
     text: entry.text,

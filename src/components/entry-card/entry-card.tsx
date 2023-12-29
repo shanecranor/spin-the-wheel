@@ -5,12 +5,11 @@ export interface EntryCardProps {
   author: string;
   // isSafe: boolean; //mod approved
   isOnWheel?: boolean;
-  onAccept?: () => void;
-  onRemove?: () => void;
+  toggleOnWheel: () => void;
   onDelete?: () => void;
 }
 // TODO: remove placehold functions
-export const EntryCard = ({ text, author, isOnWheel = true, onAccept = () => (0), onRemove = () => (0), onDelete = () => (0) }: EntryCardProps) => {
+export const EntryCard = ({ text, author, toggleOnWheel, isOnWheel, onDelete = () => (0) }: EntryCardProps) => {
   return (
     <Paper withBorder className={styles["c-entry-card"]}>
       <div className={styles["entry-text"]}>
@@ -19,12 +18,8 @@ export const EntryCard = ({ text, author, isOnWheel = true, onAccept = () => (0)
       </div>
       <div className={styles["entry-controls"]}>
         {/* lets make a checkbox here for accept and remove */}
-        <Checkbox color="green.5" size="lg" checked={isOnWheel} onChange={(e) => {
-          if (e.target.value) {
-            onAccept()
-          } else {
-            onRemove()
-          }
+        <Checkbox color="green.5" size="lg" defaultChecked={isOnWheel} onChange={() => {
+          toggleOnWheel()
         }} />
         <CloseButton size="lg" aria-label="delete this entry" onClick={onDelete} />
       </div>
