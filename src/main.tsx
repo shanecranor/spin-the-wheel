@@ -47,8 +47,8 @@ const green: MantineColorsTuple = [
   "#63bb4c",
   "#51a43d",
   "#469234",
-  "#387e27"
-]
+  "#387e27",
+];
 const theme = createTheme({
   colors: {
     red,

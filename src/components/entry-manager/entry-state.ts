@@ -1,6 +1,5 @@
 import { observable } from "@legendapp/state";
 
-
 export interface EntryProps {
   id: number;
   text: string;
@@ -54,5 +53,4 @@ const tempEntryData: EntryProps[] = [
   },
 ];
 
-
-export const entryState$ = observable<EntryProps[]>(tempEntryData)
+export const entryState$ = observable<EntryProps[]>(tempEntryData);
