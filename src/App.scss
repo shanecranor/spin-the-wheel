@@ -1,21 +1,34 @@
 #root {
   width: 100%;
-  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
   position: relative;
 }
 
 main {
-  display: grid;
-  justify-content: space-between;
-  grid-template-columns: 1fr auto;
   > .wheel {
-    flex-grow: 1;
-    max-width: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+
+    .wheel-container {
+      max-width: 70vh;
+      width: 100%;
+    }
     > .wheel-controls {
       display: flex;
     }
   }
+  .sidebar-button {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+  }
+}
+
+aside {
+  background: none;
+  padding: 16px;
 }

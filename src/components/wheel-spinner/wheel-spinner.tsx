@@ -2,22 +2,54 @@ import { SliceData } from "../wheel/types";
 import { Wheel } from "../wheel/wheel";
 import { observer } from "@legendapp/state/react";
 import { wheelState$ } from "./wheel-state";
-import { buildWheelOffsets } from "../wheel/wheel-svg-generator";
+import { WHEEL_COLORS, buildWheelOffsets } from "../wheel/wheel-svg-generator";
 import styles from "./wheel-spinner.module.scss";
-export const WheelSpinner = observer(({ slices }: { slices: SliceData[] }) => {
-  // TODO: PASS A FUNCTION FOR REMOVING SLICES FROM STATE TO CALL
-  // if (slices.length === 0) {
-  // }
-  return (
-    <div className={styles["c-wheel-spinner"]}>
-      <Wheel sliceData={slices} rotation={wheelState$.rotation.get()} />
-      <button onClick={() => doSpin(slices)}>Spin me</button>
-    </div>
-  );
-});
+import { useDisclosure } from "@mantine/hooks";
+import { Button, Modal, Text } from "@mantine/core";
+import confetti from "canvas-confetti";
+export const WheelSpinner = observer(
+  ({
+    slices,
+    setWinner,
+    removeWinner,
+  }: {
+    slices: SliceData[];
+    setWinner: (id: number) => void;
+    removeWinner: (id: number) => void;
+  }) => {
+    const [opened, { open, close }] = useDisclosure(false);
+    return (
+      <div className={styles["c-wheel-spinner"]}>
+        <Wheel sliceData={slices} rotation={wheelState$.rotation.get()} />
+        <button onClick={() => doSpin(slices, open, setWinner)}>Spin me</button>
+        <Modal opened={opened} onClose={close} title="Winner!!" centered>
+          <Text>
+            {
+              slices.find((item) => item.id == wheelState$.selectedItemId.get())
+                ?.text
+            }
+          </Text>
+          <Button
+            onClick={() => {
+              removeWinner(wheelState$.selectedItemId.peek());
+              close();
+            }}
+          >
+            Remove Winner
+          </Button>
+        </Modal>
+      </div>
+    );
+  }
+);
 
-function doSpin(slices: SliceData[]) {
+function doSpin(
+  slices: SliceData[],
+  open: () => void,
+  setWinner: (id: number) => void
+) {
   //fetch slice data
+
   const sliceData = slices;
   //choose a random slice to win
   const winnerIdx = Math.floor(Math.random() * sliceData.length);
@@ -36,14 +68,51 @@ function doSpin(slices: SliceData[]) {
       newAngle +
       Math.ceil(Math.random() * 3 + 2) * -360
   );
-  // setTimeout(() => {
-  //   wheelState$.sliceData.set((old) => old.filter((item) => item.id != winnerSlice.id))
-  // }, 5000)
+  setTimeout(() => {
+    setWinner(winnerSlice.id);
+    open();
+    fireworks();
+  }, 4200);
 }
 
-// function getRandomFloat(min: number, max: number) {
-//   if (min > max) {
-//     [min, max] = [max, min]; // Swap if min is greater than max
-//   }
-//   return Math.random() * (max - min) + min;
-// }
+function getRandomFloat(min: number, max: number) {
+  if (min > max) {
+    [min, max] = [max, min]; // Swap if min is greater than max
+  }
+  return Math.random() * (max - min) + min;
+}
+
+function fireworks() {
+  for (let i = 0; i < 7; i++) {
+    setTimeout(
+      () => shootFireworks((7 - i) * 10),
+      i * 500 + Math.random() * 90
+    );
+  }
+}
+
+function shootFireworks(particleCount: number) {
+  const defaults = {
+    startVelocity: 20,
+    spread: 360,
+    ticks: 60,
+    zIndex: 0,
+    decay: 0.93,
+    scalar: 1.2,
+    colors: WHEEL_COLORS,
+  };
+  confetti({
+    ...defaults,
+    particleCount,
+    origin: { x: getRandomFloat(0.1, 0.4), y: Math.random() - 0.2 },
+  });
+  setTimeout(
+    () =>
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: getRandomFloat(0.6, 0.9), y: Math.random() - 0.2 },
+      }),
+    250
+  );
+}

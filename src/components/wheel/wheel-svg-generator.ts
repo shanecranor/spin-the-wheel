@@ -1,5 +1,12 @@
 import { SliceData } from "./types";
-
+export const WHEEL_COLORS = [
+  "#746EE0",
+  "#7FC9F3",
+  "#81E27F",
+  "#EB55AA",
+  "#F2982C",
+  "#FADD81",
+];
 export function buildWheelOffsets(sliceData: SliceData[]) {
   const totalSliceWeight = sliceData.reduce(
     (acc, slice) => acc + slice.weight,
@@ -9,14 +16,7 @@ export function buildWheelOffsets(sliceData: SliceData[]) {
     (slice) => slice.weight / totalSliceWeight
   );
   const gradient = sliceWeights.map((weight, idx) => {
-    const color = [
-      "#746EE0",
-      "#7FC9F3",
-      "#81E27F",
-      "#EB55AA",
-      "#F2982C",
-      "#FADD81",
-    ][idx % 6];
+    const color = WHEEL_COLORS[idx % 6];
     const start = sliceWeights
       .slice(0, idx)
       .reduce((acc, weight) => acc + weight, 0);
@@ -79,6 +79,15 @@ export function buildWheelSVG(sliceData: SliceData[]) {
     const pathD = describeArc(centerX, centerY, radius, start * 360, end * 360);
     return `<path d="${pathD}" fill="${color}" />`;
   });
+  if (paths.length === 0) {
+    return "";
+  }
+  //if paths is 1 then just render a circle
+  if (paths.length === 1) {
+    return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="100" r="100" fill="${paths[0].split('"')[3]}" />
+    </svg>`;
+  }
 
   return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
   <g transform="rotate(90, 100, 100)">${paths.join("")}</g></svg>`;
