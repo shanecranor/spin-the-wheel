@@ -15,7 +15,7 @@ const tempEntryData: EntryProps[] = [
     text: "end stream",
     author: "User123",
     isSafe: true,
-    isOnWheel: true,
+    isOnWheel: false,
     isWinner: false,
   },
   {
@@ -23,35 +23,35 @@ const tempEntryData: EntryProps[] = [
     text: "play valorant",
     author: "GamerGalaxy",
     isSafe: true,
-    isOnWheel: true,
+    isOnWheel: false,
   },
   {
     id: 3,
     text: "cry",
     author: "TearsOfJoy",
     isSafe: true,
-    isOnWheel: true,
+    isOnWheel: false,
   },
   {
     id: 4,
     text: "eat spicy chip",
     author: "SpicyFanatic",
     isSafe: true, // Assuming it's generally safe
-    isOnWheel: true,
+    isOnWheel: false,
   },
   {
     id: 5,
-    text: "jumping jacks",
+    text: "do a really long task ie the entire B movie script",
     author: "ActiveStreamer",
     isSafe: true,
-    isOnWheel: true,
+    isOnWheel: false,
   },
   {
     id: 6,
     text: "100 pushups",
     author: "FitnessFreak",
     isSafe: true, // Assuming general fitness level of audience
-    isOnWheel: true,
+    isOnWheel: false,
   },
 ];
 
@@ -59,4 +59,6 @@ export const entryState$ = observable<EntryProps[]>(
   tempEntryData
     .concat(tempEntryData.map((entry) => ({ ...entry, id: entry.id + 6 })))
     .concat(tempEntryData.map((entry) => ({ ...entry, id: entry.id + 12 })))
+    .concat(tempEntryData.map((entry) => ({ ...entry, id: entry.id + 18 })))
+    .concat(tempEntryData.map((entry) => ({ ...entry, id: entry.id + 24 })))
 );

@@ -1,9 +1,10 @@
+import React from "react";
 import styles from "./slice.module.scss";
 interface SliceProps {
-  text: string;
+  children: React.ReactNode;
   rotation: number;
 }
-export const Slice = ({ text, rotation }: SliceProps) => {
+export const Slice = ({ children, rotation }: SliceProps) => {
   return (
     <div
       className={styles["c-slice"]}
@@ -11,7 +12,7 @@ export const Slice = ({ text, rotation }: SliceProps) => {
         transform: `translateY(-50%) rotate(${rotation}deg) `,
       }}
     >
-      <div className={styles["text"]}>{text}</div>
+      <div className={styles["text"]}>{children}</div>
     </div>
   );
 };

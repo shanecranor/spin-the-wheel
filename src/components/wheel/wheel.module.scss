@@ -1,4 +1,6 @@
 .c-wheel {
+  overflow: hidden;
+  position: relative;
   box-sizing: border-box;
   //make a big ole circluar
   width: 100%;
@@ -18,9 +20,6 @@
     //move to the right
     transform: translate(50%, 0%);
   }
-  //apply the spinning op
-
-  // animation: spin 0.2s linear infinite;
 }
 
 //create a temporary spinning animation

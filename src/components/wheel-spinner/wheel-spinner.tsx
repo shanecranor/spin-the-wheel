@@ -20,7 +20,10 @@ export const WheelSpinner = observer(
     const [opened, { open, close }] = useDisclosure(false);
     return (
       <div className={styles["c-wheel-spinner"]}>
-        <Wheel sliceData={slices} rotation={wheelState$.rotation.get()} />
+        <div className={styles["wheel-container"]}>
+          <Wheel sliceData={slices} rotation={wheelState$.rotation.get()} />
+          <div className={styles["wheel-indicator"]}>◄</div> {/* ◀ for smooth*/}
+        </div>
         <button onClick={() => doSpin(slices, open, setWinner)}>Spin me</button>
         <Modal opened={opened} onClose={close} title="Winner!!" centered>
           <Text>
@@ -60,19 +63,17 @@ function doSpin(
   const wheelOffsets = buildWheelOffsets(sliceData);
   const idx = sliceData.findIndex((slice) => slice.id === winnerSlice.id);
   //set the rotation to the random angle
-  const newAngle = wheelOffsets[idx].mid * 360; //getRandomFloat(wheelOffsets[idx].start, wheelOffsets[idx].end) * 360
+  const newAngle =
+    getRandomFloat(wheelOffsets[idx].start, wheelOffsets[idx].end) * 360;
+  const spins = Math.ceil(Math.random() * 2 + 4);
   wheelState$.rotation.set(
-    (old) =>
-      old +
-      (360 - (old % 360)) +
-      newAngle +
-      Math.ceil(Math.random() * 3 + 2) * -360
+    (old) => old + (360 - (old % 360)) + newAngle + spins * -360
   );
   setTimeout(() => {
     setWinner(winnerSlice.id);
     open();
     fireworks();
-  }, 4200);
+  }, 10200);
 }
 
 function getRandomFloat(min: number, max: number) {

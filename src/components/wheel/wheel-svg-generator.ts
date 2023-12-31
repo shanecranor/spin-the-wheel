@@ -118,7 +118,7 @@ export function buildWheelSVG(sliceData: SliceData[]) {
   if (paths.length === 1) {
     return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     ${outerCircle}
-    <circle cx="100" cy="100" r="100" fill="${paths[0].split('"')[3]}"/>
+    <circle cx="100" cy="100" r="100" fill="${wheelOffsets[0].color}"/>
     </svg>`;
   }
 

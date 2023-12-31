@@ -10,8 +10,10 @@
   align-items: center;
 
   .text {
+    //prevent from hitting the center
+    padding-left: 80px;
+    //prevent from going over the outer edge
     margin-right: 30px;
-    font-size: large;
     color: black;
   }
 }

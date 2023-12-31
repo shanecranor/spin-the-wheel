@@ -36,12 +36,8 @@ export const EntryCard = ({
       }`}
     >
       <div className={styles["entry-text"]}>
-        <Text size="lg" truncate="end">
-          {text}
-        </Text>
-        <Text size="xs" truncate="end">
-          {author}
-        </Text>
+        <Text size="lg">{text}</Text>
+        <Text size="xs">{author}</Text>
       </div>
       <div className={styles["entry-controls"]}>
         {/* lets make a checkbox here for accept and remove */}
