@@ -49,11 +49,27 @@ const green: MantineColorsTuple = [
   "#469234",
   "#387e27",
 ];
+const pink: MantineColorsTuple = [
+  "#ffe8f7",
+  "#ffd1e7",
+  "#faa1cc",
+  "#f66eae",
+  "#F357A1",
+  "#AD3E72",
+  "#f0167f",
+  "#d6036c",
+  "#bf0060",
+  "#a90053",
+];
 const theme = createTheme({
+  primaryColor: "pink",
+  primaryShade: 4,
+  white: "#fff",
   colors: {
     red,
     green,
     dark,
+    pink,
   },
 });
 ReactDOM.createRoot(document.getElementById("root")!).render(

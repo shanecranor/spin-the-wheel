@@ -7,11 +7,12 @@
   //var(--mantine-color-green-3);
 
   &:global(.on-wheel) {
-    box-shadow: 0 0 6px -3px var(--mantine-color-green-3);
+    box-shadow: 0 0 12px -10px var(--mantine-color-green-3);
   }
 
   &:global(.winner) {
-    box-shadow: 0 0 10px -2px var(--mantine-color-yellow-3),
+    box-shadow: 0 0 12px -10px var(--mantine-color-yellow-3),
+      0 0 15px -13px var(--mantine-color-yellow-3),
       0 0 50px -30px var(--mantine-color-yellow-3);
     border: 1px solid var(--mantine-color-yellow-3);
     background: color-mix(

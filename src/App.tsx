@@ -29,7 +29,9 @@ const App = observer(() => {
     >
       {/* <AppShell.Header>Header</AppShell.Header> */}
       <AppShell.Aside>
-        <Button onClick={toggleDesktop}>Hide Submissions</Button>
+        <Button variant="outline" onClick={toggleDesktop}>
+          Hide Submissions
+        </Button>
         <EntryManager />
       </AppShell.Aside>
       <AppShell.Main>

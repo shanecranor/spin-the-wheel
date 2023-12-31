@@ -29,6 +29,9 @@ main {
 }
 
 aside {
-  background: none;
-  padding: 16px;
+  background: var(--mantine-color-dark-8);
+  display: grid;
+  grid-template-columns: 1fr;
+  //don't center grid items vertically
+  align-content: start;
 }

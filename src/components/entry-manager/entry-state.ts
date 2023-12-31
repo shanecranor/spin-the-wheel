@@ -16,7 +16,7 @@ const tempEntryData: EntryProps[] = [
     author: "User123",
     isSafe: true,
     isOnWheel: true,
-    isWinner: true,
+    isWinner: false,
   },
   {
     id: 2,
@@ -55,4 +55,8 @@ const tempEntryData: EntryProps[] = [
   },
 ];
 
-export const entryState$ = observable<EntryProps[]>(tempEntryData);
+export const entryState$ = observable<EntryProps[]>(
+  tempEntryData
+    .concat(tempEntryData.map((entry) => ({ ...entry, id: entry.id + 6 })))
+    .concat(tempEntryData.map((entry) => ({ ...entry, id: entry.id + 12 })))
+);

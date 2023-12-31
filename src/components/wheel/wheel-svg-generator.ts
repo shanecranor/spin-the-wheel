@@ -71,26 +71,66 @@ function describeArc(
 
 export function buildWheelSVG(sliceData: SliceData[]) {
   const wheelOffsets = buildWheelOffsets(sliceData);
-  const centerX = 100; // Adjust as needed
-  const centerY = 100; // Adjust as needed
-  const radius = 100; // Adjust as needed
+  const centerX = 100;
+  const centerY = 100;
+  const radius = 96; //100 = full circle, set to 96 to allow for the outer circle stroke
+  // Adjust overlap of the slices can create cool patterns if combined with opacity
+  // Originally designed to fix aliasing issues (replaced with stroke)
+  const overlap = 0;
+  //opacity of each slice, good for debugging
+  const opacity = 1.0;
+
+  // fixes aliasing issues
+  // any larger than 0.2 and things get asymmetrical and weird
+  const sliceStrokeWidth = 0.2;
+  // Enable simple paths to overlay the non-stroked paths and remove the aliasing issues
+  const overlaySimplePaths = true;
+  const enableSeperatorLines = false;
+
+  const lineThickness = 0.5; // Adjust thickness of the line
+
+  const outerCircleStrokeWidth = 4; // Thickness of the outer circle stroke
+  const outerCircleRadius = radius + outerCircleStrokeWidth / 2; // Radius of the outer circle
 
   const paths = wheelOffsets.map(({ color, start, end }) => {
-    const pathD = describeArc(centerX, centerY, radius, start * 360, end * 360);
-    return `<path d="${pathD}" fill="${color}" />`;
+    const pathD = describeArc(
+      centerX,
+      centerY,
+      radius,
+      start * 360 - overlap,
+      end * 360 + overlap
+    );
+    return `<path d="${pathD}" opacity="${opacity}" fill="${color}" stroke="${color}" stroke-width="${sliceStrokeWidth}" />`;
   });
+  const simplePaths = wheelOffsets.map(({ color, start, end }) => {
+    const pathD = describeArc(centerX, centerY, radius, start * 360, end * 360);
+    return `<path d="${pathD}" opacity="${opacity}" fill="${color}" />`;
+  });
+  const lines = wheelOffsets.map(({ end }) => {
+    const lineD = describeArc(centerX, centerY, radius, end * 360, end * 360);
+    return `<path d="${lineD}" stroke="white" stroke-width="${lineThickness}" />`;
+  });
+  const outerCircle = `<circle cx="${centerX}" cy="${centerY}" r="${outerCircleRadius}" stroke="white" stroke-width="${outerCircleStrokeWidth}" fill="white" />`;
   if (paths.length === 0) {
     return "";
   }
   //if paths is 1 then just render a circle
   if (paths.length === 1) {
     return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="100" cy="100" r="100" fill="${paths[0].split('"')[3]}" />
+    ${outerCircle}
+    <circle cx="100" cy="100" r="100" fill="${paths[0].split('"')[3]}"/>
     </svg>`;
   }
 
   return `<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-  <g transform="rotate(90, 100, 100)">${paths.join("")}</g></svg>`;
+            ${outerCircle}
+            <g transform="rotate(90, 100, 100)">
+              ${paths.join("")}
+              ${overlaySimplePaths ? simplePaths.join("") : ""}
+              ${enableSeperatorLines ? lines.join("") : ""}
+            </g>
+         
+          </svg>`;
 }
 
 export function buildWheelGradient(sliceData: SliceData[]) {

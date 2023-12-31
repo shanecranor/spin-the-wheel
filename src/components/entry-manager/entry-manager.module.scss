@@ -1,6 +1,8 @@
 .c-entry-manager {
-  > .approved-entries {
-    display: grid;
-    gap: 8px;
+  flex-grow: 0;
+  flex-shrink: 1;
+  .entry-tab {
+    max-height: calc(100cqh - 80px); // This is a hack, should fix at somepoint
+    overflow-y: scroll;
   }
 }
