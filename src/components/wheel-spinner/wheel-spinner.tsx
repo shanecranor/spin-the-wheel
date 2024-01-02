@@ -24,7 +24,13 @@ export const WheelSpinner = observer(
           <Wheel sliceData={slices} rotation={wheelState$.rotation.get()} />
           <div className={styles["wheel-indicator"]}>◄</div> {/* ◀ for smooth*/}
         </div>
-        <button onClick={() => doSpin(slices, open, setWinner)}>Spin me</button>
+        <Button
+          m="md"
+          size="lg"
+          onClick={() => doSpin(slices, open, setWinner)}
+        >
+          Spin me
+        </Button>
         <Modal opened={opened} onClose={close} title="Winner!!" centered>
           <Text>
             {

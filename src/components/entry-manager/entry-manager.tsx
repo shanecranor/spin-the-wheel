@@ -1,4 +1,4 @@
-import { Accordion, SimpleGrid, Tabs, Text } from "@mantine/core";
+import { Accordion, Paper, SimpleGrid, Tabs, Text } from "@mantine/core";
 import { EntryCard } from "../entry-card/entry-card";
 import styles from "./entry-manager.module.scss";
 import { EntryProps, entryState$ } from "./entry-state";
@@ -41,20 +41,6 @@ export const EntryManager = () => {
     .map((entry) => createEntryCard(entry));
   return (
     <div className={styles["c-entry-manager"]}>
-      <EntryCreator
-        createEntry={(entryText) =>
-          entryState$.set((old) => [
-            ...old,
-            {
-              id: getRandomInt(),
-              text: entryText,
-              author: "you",
-              isSafe: true,
-              isOnWheel: true,
-            },
-          ])
-        }
-      />
       <Tabs defaultValue="submissions">
         <Tabs.List grow>
           <Tabs.Tab value="wheel-items">Wheel Items</Tabs.Tab>
@@ -73,6 +59,9 @@ export const EntryManager = () => {
         </Tabs.Panel>
 
         <Tabs.Panel value="submissions" className={styles["entry-tab"]}>
+          <Paper m="md" p="md" withBorder>
+            <EntryCreator createEntry={createEntry} />
+          </Paper>
           <Accordion defaultValue={["mod-approved"]} multiple>
             <Accordion.Item value="mod-approved">
               <Accordion.Control>Approved</Accordion.Control>
@@ -120,3 +109,15 @@ function getRandomInt() {
   window.crypto.getRandomValues(buffer);
   return buffer[0];
 }
+
+const createEntry = (entryText: string) =>
+  entryState$.set((old) => [
+    ...old,
+    {
+      id: getRandomInt(),
+      text: entryText,
+      author: "you",
+      isSafe: true,
+      isOnWheel: true,
+    },
+  ]);

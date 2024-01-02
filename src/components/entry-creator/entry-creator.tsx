@@ -1,11 +1,11 @@
-import { Button, Paper, TextInput } from "@mantine/core";
+import { Button, TextInput } from "@mantine/core";
 import styles from "./entry-creator.module.scss";
 import { observer, useObservable } from "@legendapp/state/react";
 const EntryCreator = observer(
   ({ createEntry }: { createEntry: (text: string) => void }) => {
     const entryText$ = useObservable("");
     return (
-      <Paper className={styles["c-entry-creator"]} m="sm" p="sm">
+      <div className={styles["c-entry-creator"]}>
         <TextInput
           mb="sm"
           label="Create a wheel item"
@@ -17,7 +17,7 @@ const EntryCreator = observer(
         <Button onClick={() => createEntry(entryText$.peek())}>
           Add to wheel
         </Button>
-      </Paper>
+      </div>
     );
   }
 );

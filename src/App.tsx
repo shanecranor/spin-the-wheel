@@ -63,10 +63,10 @@ const App = observer(() => {
             />
           </div>
           <div className="wheel-controls">
-            <Button>Enable Submissions</Button>
+            {/* <Button>Enable Submissions</Button>
             <ActionIcon>
               <IconSettings />
-            </ActionIcon>
+            </ActionIcon> */}
             <div className="settings">
               {/* <button>import</button>
             <button>export</button>
