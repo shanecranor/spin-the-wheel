@@ -42,7 +42,7 @@ const tempEntryData: EntryProps[] = [
   {
     id: 5,
     text: "do a really long task ie the entire B movie script",
-    author: "ActiveStreamer",
+    author: "guy with a really long and annoying username becaause why not",
     isSafe: true,
     isOnWheel: false,
   },
@@ -55,10 +55,4 @@ const tempEntryData: EntryProps[] = [
   },
 ];
 
-export const entryState$ = observable<EntryProps[]>(
-  tempEntryData
-    .concat(tempEntryData.map((entry) => ({ ...entry, id: entry.id + 6 })))
-    .concat(tempEntryData.map((entry) => ({ ...entry, id: entry.id + 12 })))
-    .concat(tempEntryData.map((entry) => ({ ...entry, id: entry.id + 18 })))
-    .concat(tempEntryData.map((entry) => ({ ...entry, id: entry.id + 24 })))
-);
+export const entryState$ = observable<EntryProps[]>(tempEntryData);
