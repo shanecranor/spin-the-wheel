@@ -14,7 +14,7 @@ export const Wheel = observer(({ sliceData, rotation }: WheelProps) => {
   const svgMarkup = buildWheelSVG(sliceData);
   const base64SVG = btoa(svgMarkup);
   const backgroundImage = `url('data:image/svg+xml;base64,${base64SVG}')`;
-  const largestFontSize = 1100 / (sliceData.length + 20) + 5;
+  const largestFontSize = 27;
   const smallestFontSize = 16;
   if (sliceData.length === 0)
     return (

@@ -18,7 +18,7 @@ const App = observer(() => {
   const [isSidebarOpen, { toggle: toggleDesktop }] = useDisclosure();
   return (
     <AppShell
-      withBorder={false}
+      // withBorder={false}
       padding="md"
       // header={{ height: 60 }}
       aside={{
@@ -29,8 +29,14 @@ const App = observer(() => {
     >
       {/* <AppShell.Header>Header</AppShell.Header> */}
       <AppShell.Aside>
-        <Button variant="outline" onClick={toggleDesktop}>
-          Hide Submissions
+        <Button
+          variant="outline"
+          color="pink.3"
+          mx="sm"
+          mt="sm"
+          onClick={toggleDesktop}
+        >
+          hide wheel manager
         </Button>
         <EntryManager />
       </AppShell.Aside>
@@ -74,8 +80,8 @@ const App = observer(() => {
           </div>
         </div>
         {!isSidebarOpen && (
-          <Button className="sidebar-button" onClick={toggleDesktop}>
-            Show Submissions
+          <Button className="sidebar-button" m="sm" onClick={toggleDesktop}>
+            open wheel manager
           </Button>
         )}
       </AppShell.Main>
