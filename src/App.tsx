@@ -10,9 +10,9 @@ import {
 } from "./components/entry-manager/entry-state";
 import { observer } from "@legendapp/state/react";
 import { SliceData } from "./components/wheel/types";
-import { ActionIcon, AppShell, Button } from "@mantine/core";
+import { AppShell, Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconSettings } from "@tabler/icons-react";
+// import { IconSettings } from "@tabler/icons-react";
 const App = observer(() => {
   // const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [isSidebarOpen, { toggle: toggleDesktop }] = useDisclosure();
