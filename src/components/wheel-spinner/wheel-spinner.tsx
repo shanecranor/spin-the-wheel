@@ -28,6 +28,7 @@ export const WheelSpinner = observer(
           m="md"
           size="lg"
           onClick={() => doSpin(slices, open, setWinner)}
+          disabled={slices.length === 0 || wheelState$.isRotating.get()}
         >
           Spin me
         </Button>
@@ -75,10 +76,12 @@ function doSpin(
   wheelState$.rotation.set(
     (old) => old + (360 - (old % 360)) + newAngle + spins * -360
   );
+  wheelState$.isRotating.set(true);
   setTimeout(() => {
     setWinner(winnerSlice.id);
     open();
     fireworks();
+    wheelState$.isRotating.set(false);
   }, 10200);
 }
 
