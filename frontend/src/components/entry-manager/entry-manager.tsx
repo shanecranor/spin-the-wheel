@@ -1,8 +1,10 @@
 import { Accordion, Paper, SimpleGrid, Tabs, Text } from "@mantine/core";
 import { EntryCard } from "../entry-card/entry-card";
 import styles from "./entry-manager.module.scss";
-import { EntryProps, entryState$ } from "./entry-state";
+import { entryState$ } from "./entry-state";
+
 import EntryCreator from "../entry-creator/entry-creator";
+import { EntryProps } from "@shared/types";
 
 function createEntryCard(entry: EntryProps) {
   // create the functions required for each card here

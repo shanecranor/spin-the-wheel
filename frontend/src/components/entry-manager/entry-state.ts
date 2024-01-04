@@ -1,14 +1,5 @@
 import { observable } from "@legendapp/state";
-
-export interface EntryProps {
-  id: number;
-  text: string;
-  author: string;
-  isSafe: boolean;
-  isOnWheel: boolean;
-  isWinner?: boolean;
-}
-
+import { EntryProps } from "@shared/types";
 const tempEntryData: EntryProps[] = [
   {
     id: 1,
