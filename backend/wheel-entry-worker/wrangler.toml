@@ -8,8 +8,9 @@ name = "WHEEL_ENTRIES"
 class_name = "WheelEntries"
 
 [[migrations]]
-tag = "v1"
+tag = "v2"
 new_classes = ["WheelEntries"]
+
 # Variable bindings. These are arbitrary, plaintext strings (similar to environment variables)
 # Note: Use secrets to store sensitive data.
 # Docs: https://developers.cloudflare.com/workers/platform/environment-variables
