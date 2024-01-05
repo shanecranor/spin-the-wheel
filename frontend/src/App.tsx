@@ -4,14 +4,13 @@
 import "./App.scss";
 import { EntryManager } from "./components/entry-manager/entry-manager";
 import { WheelSpinner } from "./components/wheel-spinner/wheel-spinner";
-import {
-  EntryProps,
-  entryState$,
-} from "./components/entry-manager/entry-state";
+import { getEntries } from "./state/entry-state";
 import { observer } from "@legendapp/state/react";
 import { SliceData } from "./components/wheel/types";
 import { AppShell, Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { localCommands } from "./state/local-commands";
+import { EntryProps } from "@shared/types";
 // import { IconSettings } from "@tabler/icons-react";
 const App = observer(() => {
   // const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
@@ -38,28 +37,16 @@ const App = observer(() => {
         >
           hide wheel manager
         </Button>
-        <EntryManager />
+        <EntryManager stateFunctions={localCommands} />
       </AppShell.Aside>
       <AppShell.Main>
         <div className="wheel">
           <h1>Spin the Wheel</h1>
           <div className="wheel-container">
             <WheelSpinner
-              slices={getActiveSlices(entryState$.get())}
-              setWinner={(id: number) =>
-                entryState$.set((old) =>
-                  old.map((entry) =>
-                    entry.id === id ? { ...entry, isWinner: true } : entry
-                  )
-                )
-              }
-              removeWinner={(id: number) =>
-                entryState$.set((old) =>
-                  old.map((entry) =>
-                    entry.id === id ? { ...entry, isOnWheel: false } : entry
-                  )
-                )
-              }
+              slices={getActiveSlices(getEntries())}
+              setIsWinner={localCommands.setIsWinner}
+              setIsOnWheel={localCommands.setIsOnWheel}
             />
           </div>
           <div className="wheel-controls">

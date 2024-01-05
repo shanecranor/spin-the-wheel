@@ -3,5 +3,3 @@ export interface ViewerEntryBody {
 	text: string;
 	author: string;
 }
-
-export type Action = 'Create' | 'Delete' | 'Approve' | 'Move to wheel' | 'Get data';

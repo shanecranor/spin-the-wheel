@@ -12,17 +12,18 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import styles from "./entry-card.module.scss";
-import { EntryProps } from "../entry-manager/entry-state";
+import { EntryProps } from "@shared/types";
+import { EntryIdBoolFunction, EntryIdFunction } from "../../state/commands";
 export interface EntryCardProps {
   entry: EntryProps;
-  toggleOnWheel: () => void;
-  onDelete?: () => void;
+  setIsOnWheel: EntryIdBoolFunction;
+  deleteEntry: EntryIdFunction;
 }
 // TODO: remove placehold functions
 export const EntryCard = ({
   entry,
-  toggleOnWheel,
-  onDelete = () => 0,
+  setIsOnWheel,
+  deleteEntry,
 }: EntryCardProps) => {
   // const CheckboxIcon: CheckboxProps["icon"] = (others) => (
   //   <IconCheck {...others} />
@@ -47,7 +48,7 @@ export const EntryCard = ({
           size="lg"
           checked={isOnWheel}
           onChange={() => {
-            toggleOnWheel();
+            setIsOnWheel();
           }}
         /> */}
         {isOnWheel ? (
@@ -56,7 +57,7 @@ export const EntryCard = ({
             color="gray"
             size="lg"
             aria-label="remove from wheel"
-            onClick={toggleOnWheel}
+            onClick={() => setIsOnWheel(entry.id, false)}
           >
             <IconX />
           </ActionIcon>
@@ -67,7 +68,7 @@ export const EntryCard = ({
               color="green.4"
               size="lg"
               aria-label="add to wheel"
-              onClick={toggleOnWheel}
+              onClick={() => setIsOnWheel(entry.id, true)}
             >
               <IconCheck />
             </ActionIcon>
@@ -77,7 +78,7 @@ export const EntryCard = ({
               size="lg"
               aria-label="delete entry"
             >
-              <IconTrash onClick={onDelete} />
+              <IconTrash onClick={() => deleteEntry(entry.id)} />
             </ActionIcon>
           </>
         )}

@@ -7,15 +7,16 @@ import styles from "./wheel-spinner.module.scss";
 import { useDisclosure } from "@mantine/hooks";
 import { Button, Modal, Text } from "@mantine/core";
 import confetti from "canvas-confetti";
+import { EntryIdBoolFunction } from "../../state/commands";
 export const WheelSpinner = observer(
   ({
     slices,
-    setWinner,
-    removeWinner,
+    setIsWinner,
+    setIsOnWheel,
   }: {
     slices: SliceData[];
-    setWinner: (id: number) => void;
-    removeWinner: (id: number) => void;
+    setIsWinner: EntryIdBoolFunction;
+    setIsOnWheel: EntryIdBoolFunction;
   }) => {
     const [opened, { open, close }] = useDisclosure(false);
     return (
@@ -27,7 +28,7 @@ export const WheelSpinner = observer(
         <Button
           m="md"
           size="lg"
-          onClick={() => doSpin(slices, open, setWinner)}
+          onClick={() => doSpin(slices, open, setIsWinner)}
           disabled={slices.length === 0 || wheelState$.isRotating.get()}
         >
           Spin me
@@ -41,7 +42,7 @@ export const WheelSpinner = observer(
           </Text>
           <Button
             onClick={() => {
-              removeWinner(wheelState$.selectedItemId.peek());
+              setIsOnWheel(wheelState$.selectedItemId.peek(), false);
               close();
             }}
           >
@@ -56,7 +57,7 @@ export const WheelSpinner = observer(
 function doSpin(
   slices: SliceData[],
   open: () => void,
-  setWinner: (id: number) => void
+  setIsWinner: EntryIdBoolFunction
 ) {
   //fetch slice data
 
@@ -78,7 +79,7 @@ function doSpin(
   );
   wheelState$.isRotating.set(true);
   setTimeout(() => {
-    setWinner(winnerSlice.id);
+    setIsWinner(winnerSlice.id, true);
     open();
     fireworks();
     wheelState$.isRotating.set(false);

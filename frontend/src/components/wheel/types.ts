@@ -1,5 +1,5 @@
 export interface SliceData {
-  id: number;
+  id: string;
   text: string;
   weight: number;
 }

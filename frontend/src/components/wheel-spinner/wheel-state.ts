@@ -2,7 +2,7 @@ import { observable } from "@legendapp/state";
 
 export interface WheelState {
   rotation: number;
-  selectedItemId: number | null;
+  selectedItemId: string | null;
   isRotating: boolean;
 }
 export const wheelState$ = observable<WheelState>({

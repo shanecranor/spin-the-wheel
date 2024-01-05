@@ -1,5 +1,5 @@
-import { EntryProps } from '@shared/types';
-import { Action as Command, ViewerEntryBody } from './types';
+import { EntryProps, Command } from '@shared/types';
+import { ViewerEntryBody } from './types';
 export interface Env {
 	WHEEL_ENTRIES: DurableObjectNamespace;
 }

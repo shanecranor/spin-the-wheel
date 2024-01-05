@@ -1,33 +1,29 @@
 import { Accordion, Paper, SimpleGrid, Tabs, Text } from "@mantine/core";
 import { EntryCard } from "../entry-card/entry-card";
 import styles from "./entry-manager.module.scss";
-import { entryState$ } from "./entry-state";
+import { getEntries } from "../../state/entry-state";
 
 import EntryCreator from "../entry-creator/entry-creator";
 import { EntryProps } from "@shared/types";
+import { CommandFunctions } from "../../state/commands";
 
-function createEntryCard(entry: EntryProps) {
-  // create the functions required for each card here
-  const toggleOnWheel = () => {
-    entryState$.set((old) =>
-      old.map((oldEntry) => {
-        if (oldEntry.id === entry.id) {
-          return {
-            ...oldEntry,
-            isOnWheel: !oldEntry.isOnWheel,
-          };
-        }
-        return oldEntry;
-      })
-    );
-  };
-  return (
-    <EntryCard key={entry.id} entry={entry} toggleOnWheel={toggleOnWheel} />
-  );
+interface EntryManagerProps {
+  stateFunctions: CommandFunctions;
 }
-
-export const EntryManager = () => {
-  const safeEntries = entryState$.get().filter((entry) => entry.isSafe);
+export const EntryManager = ({ stateFunctions }: EntryManagerProps) => {
+  const { createEntry, deleteEntry, setIsOnWheel } = stateFunctions;
+  function createEntryCard(entry: EntryProps) {
+    return (
+      <EntryCard
+        key={entry.id}
+        entry={entry}
+        setIsOnWheel={setIsOnWheel}
+        deleteEntry={deleteEntry}
+      />
+    );
+  }
+  const entries = getEntries();
+  const safeEntries = entries.filter((entry) => entry.isSafe);
   const submissions = safeEntries
     .filter((entry) => !entry.isOnWheel && !entry.isWinner)
     .map((entry) => createEntryCard(entry));
@@ -37,8 +33,7 @@ export const EntryManager = () => {
   const wheelItems = safeEntries
     .filter((entry) => entry.isOnWheel)
     .map((entry) => createEntryCard(entry));
-  const unsafe = entryState$
-    .get()
+  const unsafe = entries
     .filter((entry) => !entry.isSafe)
     .map((entry) => createEntryCard(entry));
   return (
@@ -105,21 +100,3 @@ export const EntryManager = () => {
     </div>
   );
 };
-
-function getRandomInt() {
-  const buffer = new Uint32Array(1);
-  window.crypto.getRandomValues(buffer);
-  return buffer[0];
-}
-
-const createEntry = (entryText: string) =>
-  entryState$.set((old) => [
-    ...old,
-    {
-      id: getRandomInt(),
-      text: entryText,
-      author: "you",
-      isSafe: true,
-      isOnWheel: true,
-    },
-  ]);
