@@ -154,8 +154,8 @@ export class WheelEntries {
 				return;
 			}
 			if ('error' in eventData) {
-				// the client should never send the server an error
 				// need this to filter the error out of the union type
+				// the client should never send the server an error
 				console.error(eventData.error);
 				return;
 			}
@@ -189,6 +189,9 @@ export class WheelEntries {
 					break;
 				case 'setIsOnWheel':
 					this.setIsOnWheel(eventData.id, eventData.value, sendServerError);
+					break;
+				case 'setIsWinner':
+					this.setIsWinner(eventData.id, eventData.value, sendServerError);
 					break;
 				case 'Delete':
 					this.deleteEntry(eventData.id, sendServerError);

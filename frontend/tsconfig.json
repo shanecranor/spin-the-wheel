@@ -24,6 +24,11 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "../shared/websocket-types.ts"],
+  "include": [
+    "src",
+    "../shared/websocket-types.ts",
+    "src/pages/streamer/App.tsx",
+    "admin/main.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

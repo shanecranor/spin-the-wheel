@@ -5,9 +5,18 @@ import { WSMessage } from "@shared/websocket-types";
 
 export const webSocket$ = observable<WebSocket | null>(null);
 
-export function StartWebSockets() {
+export function startWebSockets() {
+  if (webSocket$.peek() !== null) {
+    if (webSocket$.peek()?.readyState === WebSocket.OPEN) {
+      console.log("WebSocket connection already established.");
+      return;
+    }
+  }
+  //get name from window object url
+  const url = new URL(window.location.href);
+  const name = url.searchParams.get("name") || "default";
   const webSocket = new WebSocket(
-    "wss://wheel-entry-worker.shanecranor.workers.dev?name=a"
+    `wss://wheel-entry-worker.shanecranor.workers.dev?name=${name}`
   );
   webSocket.onopen = () => {
     console.log("WebSocket connection established.");
@@ -21,6 +30,7 @@ export function StartWebSockets() {
     try {
       const data = JSON.parse(event.data);
       console.log("WebSocket message received:", data);
+      handleWebSocketEvent(data);
     } catch (error) {
       console.error("Error parsing message:", error);
     }
@@ -73,6 +83,13 @@ export function handleWebSocketEvent(data: WSMessage) {
         return;
       }
       localCommands.setIsOnWheel(data.id, data.value);
+      break;
+    case "setIsWinner":
+      if (!data.id) {
+        console.error("No entry ID provided");
+        return;
+      }
+      localCommands.setIsWinner(data.id, data.value);
       break;
   }
 }

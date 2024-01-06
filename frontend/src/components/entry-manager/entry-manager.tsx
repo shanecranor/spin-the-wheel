@@ -11,14 +11,17 @@ interface EntryManagerProps {
   stateFunctions: CommandFunctions;
 }
 export const EntryManager = ({ stateFunctions }: EntryManagerProps) => {
-  const { createEntry, deleteEntry, setIsOnWheel } = stateFunctions;
+  const { createEntry, deleteEntry, setIsOnWheel, setIsSafe } = stateFunctions;
   function createEntryCard(entry: EntryProps) {
     return (
       <EntryCard
         key={entry.id}
         entry={entry}
-        setIsOnWheel={setIsOnWheel}
-        deleteEntry={deleteEntry}
+        entryActions={{
+          deleteEntry,
+          setIsOnWheel,
+          setIsSafe,
+        }}
       />
     );
   }

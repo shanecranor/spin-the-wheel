@@ -1,17 +1,4 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App.tsx";
-// Import styles of packages that you've installed.
-// All packages except `@mantine/hooks` require styles imports
-import "@mantine/core/styles.layer.css";
-import "./index.css";
-
-import {
-  ColorSchemeScript,
-  MantineColorsTuple,
-  MantineProvider,
-  createTheme,
-} from "@mantine/core";
+import { MantineColorsTuple, createTheme } from "@mantine/core";
 
 const red: MantineColorsTuple = [
   "#ffeaea",
@@ -61,7 +48,7 @@ const pink: MantineColorsTuple = [
   "#bf0060",
   "#a90053",
 ];
-const theme = createTheme({
+export const theme = createTheme({
   primaryColor: "pink",
   primaryShade: 4,
   white: "#fff",
@@ -72,11 +59,3 @@ const theme = createTheme({
     pink,
   },
 });
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <ColorSchemeScript forceColorScheme="dark" />
-    <MantineProvider theme={theme} forceColorScheme="dark">
-      <App />
-    </MantineProvider>
-  </React.StrictMode>
-);
