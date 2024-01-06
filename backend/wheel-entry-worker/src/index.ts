@@ -1,4 +1,5 @@
 import { EntryProps, Command } from '@shared/types';
+import { CreateMessage, DeleteMessage, SetterMessage, WSMessage } from '@shared/websocket-types';
 import { ViewerEntryBody } from './types';
 export interface Env {
 	WHEEL_ENTRIES: DurableObjectNamespace;
@@ -42,59 +43,73 @@ export class WheelEntries {
 			ws.send(message);
 		});
 	}
+	broadcastObject(message: WSMessage) {
+		this.broadcast(JSON.stringify(message));
+	}
 
-	async getEntry(id: string, onError: (message: string) => void, action: Command) {
+	async getEntry(id: string, onError: (message: string) => void, command: Command) {
 		const entry = await this.storage.get(id);
 		if (!entry) {
-			onError(`${action} failed, Entry ID: ${id} not found`);
+			onError(`${command} failed, Entry ID: ${id} not found`);
 			return;
 		}
 		return entry;
 	}
 
 	async deleteEntry(id: string, onError: (message: string) => void) {
-		const action: Command = 'Delete';
+		const command: Command = 'Delete';
 		const existed = await this.storage.delete(id);
 		if (!existed) {
-			onError(`${action} failed, Entry ID: ${id} not found`);
+			onError(`${command} failed, Entry ID: ${id} not found`);
 			return;
 		}
-		this.broadcast(JSON.stringify({ action, id }));
+		const message: DeleteMessage = { command, id };
+		this.broadcastObject(message);
 	}
 
 	async createEntry(entry: EntryProps) {
 		// update the storage
 		await this.storage.put(entry.id.toString(), entry);
 		// update the clients
-		this.broadcast(JSON.stringify({ action: 'create', entry }));
+		const message: CreateMessage = { command: 'Create', entry };
+		this.broadcastObject(message);
 	}
 
-	async approveEntry(id: string, onError: (message: string) => void) {
-		const action: Command = 'Approve';
-		const entry = await this.getEntry(id, onError, action);
+	async setIsSafe(id: string, isSafe: boolean, onError: (message: string) => void) {
+		const command: Command = 'setIsSafe';
+		const entry = await this.getEntry(id, onError, command);
 		if (!entry) return;
-
-		await this.storage.put(id, { ...entry, isSafe: true });
-		this.broadcast(JSON.stringify({ action, id }));
+		await this.storage.put(id, { ...entry, isSafe });
+		const message: SetterMessage = { command, id, value: isSafe };
+		this.broadcastObject(message);
 	}
 
-	async moveToWheel(id: string, onError: (message: string) => void) {
-		const action: Command = 'Move to wheel';
-		const entry = await this.getEntry(id, onError, action);
+	async setIsOnWheel(id: string, isOnWheel: boolean, onError: (message: string) => void) {
+		const command: Command = 'setIsOnWheel';
+		const entry = await this.getEntry(id, onError, command);
 		if (!entry) return;
+		await this.storage.put(id, { ...entry, isOnWheel });
+		const message: SetterMessage = { command, id, value: isOnWheel };
+		this.broadcastObject(message);
+	}
 
-		await this.storage.put(id, { ...entry, isOnWheel: true });
-		this.broadcast(JSON.stringify({ action, id }));
+	async setIsWinner(id: string, isWinner: boolean, onError: (message: string) => void) {
+		const command: Command = 'setIsOnWheel';
+		const entry = await this.getEntry(id, onError, command);
+		if (!entry) return;
+		await this.storage.put(id, { ...entry, isWinner });
+		const message: SetterMessage = { command, id, value: isWinner };
+		this.broadcastObject(message);
 	}
 
 	async sendCurrentState(serverWebSocket: WebSocket) {
-		const action: Command = 'Get data';
+		const command: Command = 'Get data';
 		let entries = Array.from((await this.storage.list<EntryProps>()).values());
-		serverWebSocket.send(JSON.stringify({ action, entries }));
+		serverWebSocket.send(JSON.stringify({ command, entries }));
 	}
 	// Handle requests sent to the Durable Object
 	async fetch(request: Request) {
-		// Apply requested action.
+		// Apply requested command.
 		let url = new URL(request.url);
 		// upgrade to websockets
 		if (request.headers.get('Upgrade') !== 'websocket') {
@@ -131,30 +146,36 @@ export class WheelEntries {
 				sendServerError('Invalid message format');
 				return;
 			}
-			let eventData;
+			let eventData: WSMessage;
 			try {
 				eventData = JSON.parse(event.data);
 			} catch (error) {
 				sendServerError('Invalid JSON');
 				return;
 			}
+			if ('error' in eventData) {
+				// the client should never send the server an error
+				// need this to filter the error out of the union type
+				console.error(eventData.error);
+				return;
+			}
 
-			switch (eventData.command as Command) {
+			switch (eventData.command) {
 				case 'Create':
 					const newEntry: EntryProps = {
 						id: crypto.randomUUID(),
-						text: eventData.data.text,
-						author: eventData.data.author,
-						isSafe: eventData.isAdmin === true,
-						isOnWheel: eventData.isAdmin === true,
+						text: eventData.entry.text,
+						author: eventData.entry.author,
+						isSafe: eventData.entry.isSafe,
+						isOnWheel: eventData.entry.isOnWheel,
 					};
 					this.createEntry(newEntry);
 					break;
-				case 'Approve':
-					this.approveEntry(eventData.id, sendServerError);
+				case 'setIsSafe':
+					this.setIsSafe(eventData.id, eventData.value, sendServerError);
 					break;
-				case 'Move to wheel':
-					this.moveToWheel(eventData.id, sendServerError);
+				case 'setIsOnWheel':
+					this.setIsOnWheel(eventData.id, eventData.value, sendServerError);
 					break;
 				case 'Delete':
 					this.deleteEntry(eventData.id, sendServerError);

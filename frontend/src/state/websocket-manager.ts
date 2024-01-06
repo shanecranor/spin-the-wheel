@@ -1,7 +1,7 @@
 import { localCommands } from "./local-commands";
 import { entryState$, mapFromEntries } from "./entry-state";
 import { observable } from "@legendapp/state";
-import { WSMessage } from "./websocket-types";
+import { WSMessage } from "@shared/websocket-types";
 
 export const webSocket$ = observable<WebSocket | null>(null);
 

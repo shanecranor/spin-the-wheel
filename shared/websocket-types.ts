@@ -1,26 +1,26 @@
 import { Command, EntryProps } from "@shared/types";
 
 type ValidatedCommand<T extends Command> = T;
-interface CreateMessage {
+export interface CreateMessage {
   command: ValidatedCommand<"Create">;
   entry: EntryProps;
 }
-interface SetterMessage {
+export interface SetterMessage {
   command: ValidatedCommand<"setIsSafe" | "setIsOnWheel" | "setIsWinner">;
   id: string;
   value: boolean;
 }
 
-interface DeleteMessage {
+export interface DeleteMessage {
   command: ValidatedCommand<"Delete">;
   id: string;
 }
 
-interface ErrorMessage {
+export interface ErrorMessage {
   error: string;
 }
 
-interface GetDataMessage {
+export interface GetDataMessage {
   command: ValidatedCommand<"Get data">;
   entries: EntryProps[];
 }

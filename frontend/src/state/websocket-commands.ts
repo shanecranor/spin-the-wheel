@@ -1,7 +1,7 @@
 import { EntryProps } from "@shared/types";
 import { webSocket$ } from "./websocket-manager";
 import { CommandFunctions } from "./commands";
-import { WSMessage } from "./websocket-types";
+import { WSMessage } from "@shared/websocket-types";
 
 const checkWebsocket = () => {
   if (webSocket$.peek() === null) {
