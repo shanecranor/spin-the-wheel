@@ -1,4 +1,4 @@
-import { EntryProps, Command } from '@shared/types';
+import { EntryProps, Command, isEntryProps } from '@shared/types';
 import { CreateMessage, DeleteMessage, SetterMessage, WSMessage } from '@shared/websocket-types';
 import { ViewerEntryBody } from './types';
 export interface Env {
@@ -162,13 +162,26 @@ export class WheelEntries {
 
 			switch (eventData.command) {
 				case 'Create':
+					if (!eventData.entry) {
+						sendServerError('No entry data provided');
+						return;
+					}
+					if (!eventData.entry.text) {
+						sendServerError('No entry text provided');
+						return;
+					}
 					const newEntry: EntryProps = {
 						id: crypto.randomUUID(),
 						text: eventData.entry.text,
 						author: eventData.entry.author,
-						isSafe: eventData.entry.isSafe,
-						isOnWheel: eventData.entry.isOnWheel,
+						isSafe: eventData.entry.isSafe || false,
+						isOnWheel: eventData.entry.isOnWheel || false,
+						isWinner: eventData.entry.isWinner || false,
 					};
+					if (!isEntryProps(newEntry)) {
+						sendServerError('Invalid entry data');
+						return;
+					}
 					this.createEntry(newEntry);
 					break;
 				case 'setIsSafe':

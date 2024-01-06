@@ -7,6 +7,17 @@ export interface EntryProps {
   isWinner?: boolean;
 }
 
+export const isEntryProps = (input: any): input is EntryProps => {
+  return (
+    typeof input.id === "string" &&
+    typeof input.text === "string" &&
+    typeof input.author === "string" &&
+    typeof input.isSafe === "boolean" &&
+    typeof input.isOnWheel === "boolean" &&
+    typeof input.isWinner === "boolean"
+  );
+};
+
 export type Command =
   | "Create"
   | "Delete"
