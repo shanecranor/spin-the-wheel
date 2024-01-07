@@ -94,7 +94,7 @@ export class WheelEntries {
 	}
 
 	async setIsWinner(id: string, isWinner: boolean, onError: (message: string) => void) {
-		const command: Command = 'setIsOnWheel';
+		const command: Command = 'setIsWinner';
 		const entry = await this.getEntry(id, onError, command);
 		if (!entry) return;
 		await this.storage.put(id, { ...entry, isWinner });

@@ -36,7 +36,6 @@ const App = observer(() => {
         collapsed: { mobile: !isSidebarOpen, desktop: !isSidebarOpen },
       }}
     >
-      {mode}
       {/* <AppShell.Header>Header</AppShell.Header> */}
       <AppShell.Aside>
         <Button
@@ -52,7 +51,6 @@ const App = observer(() => {
       </AppShell.Aside>
       <AppShell.Main>
         <div className="wheel">
-          <h1>Spin the Wheel</h1>
           <div className="wheel-container">
             <WheelSpinner
               slices={getActiveSlices(getEntries())}

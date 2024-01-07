@@ -79,6 +79,7 @@ function doSpin(
   );
   wheelState$.isRotating.set(true);
   setTimeout(() => {
+    console.log("SET IS WINNER");
     setIsWinner(winnerSlice.id, true);
     open();
     fireworks();

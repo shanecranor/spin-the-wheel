@@ -76,13 +76,13 @@ export const EntryManager = ({ stateFunctions }: EntryManagerProps) => {
               </Accordion.Panel>
             </Accordion.Item>
             <Accordion.Item value="dangerous">
-              <Accordion.Control>Potentially Unsafe</Accordion.Control>
+              <Accordion.Control>Unreviewed</Accordion.Control>
               <Accordion.Panel>
                 <SimpleGrid cols={1} spacing="sm">
                   {unsafe.length === 0 ? (
                     <Text size="lg">no new unreviewed submissions </Text>
                   ) : (
-                    submissions
+                    unsafe
                   )}
                 </SimpleGrid>
               </Accordion.Panel>
