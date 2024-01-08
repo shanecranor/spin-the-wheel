@@ -1,4 +1,3 @@
-import { SliceData } from "../wheel/types";
 import { Wheel } from "../wheel/wheel";
 import { observer } from "@legendapp/state/react";
 import { wheelState$ } from "./wheel-state";
@@ -8,13 +7,14 @@ import { useDisclosure } from "@mantine/hooks";
 import { Button, Modal, Text } from "@mantine/core";
 import confetti from "canvas-confetti";
 import { EntryIdBoolFunction } from "../../state/commands";
+import { EntryProps } from "@shared/types";
 export const WheelSpinner = observer(
   ({
-    slices,
+    wheelEntries,
     setIsWinner,
     setIsOnWheel,
   }: {
-    slices: SliceData[];
+    wheelEntries: EntryProps[];
     setIsWinner: EntryIdBoolFunction;
     setIsOnWheel: EntryIdBoolFunction;
   }) => {
@@ -22,27 +22,34 @@ export const WheelSpinner = observer(
     return (
       <div className={styles["c-wheel-spinner"]}>
         <div className={styles["wheel-container"]}>
-          <Wheel sliceData={slices} rotation={wheelState$.rotation.get()} />
-          <div className={styles["wheel-indicator"]}>◄</div> {/* ◀ for smooth*/}
+          <Wheel
+            wheelEntries={wheelEntries}
+            rotation={wheelState$.rotation.get()}
+          />
+          <div className={styles["wheel-indicator"]}>◄</div>{" "}
+          {/* ◀ for for rounding*/}
         </div>
         <Button
           m="md"
           size="lg"
-          onClick={() => doSpin(slices, open, setIsWinner)}
-          disabled={slices.length === 0 || wheelState$.isRotating.get()}
+          onClick={() => doSpin(wheelEntries, open, setIsWinner)}
+          disabled={wheelEntries.length === 0 || wheelState$.isRotating.get()}
         >
           Spin me
         </Button>
         <Modal opened={opened} onClose={close} title="Winner!!" centered>
           <Text>
+            The wheel chooses{" "}
             {
-              slices.find((item) => item.id == wheelState$.selectedItemId.get())
-                ?.text
+              wheelEntries.find(
+                (item) => item.id == wheelState$.winningEntry.id.get()
+              )?.text
             }
           </Text>
+          <Text></Text>
           <Button
             onClick={() => {
-              setIsOnWheel(wheelState$.selectedItemId.peek(), false);
+              setIsOnWheel(wheelState$.winningEntry.id.peek(), false);
               close();
             }}
           >
@@ -55,21 +62,21 @@ export const WheelSpinner = observer(
 );
 
 function doSpin(
-  slices: SliceData[],
+  wheelEntries: EntryProps[],
   open: () => void,
   setIsWinner: EntryIdBoolFunction
 ) {
   //fetch slice data
 
-  const sliceData = slices;
+  const sliceData = wheelEntries;
   //choose a random slice to win
   const winnerIdx = Math.floor(Math.random() * sliceData.length);
-  const winnerSlice = sliceData[winnerIdx];
-  //set the winner slice
-  wheelState$.selectedItemId.set(winnerSlice.id);
+  const winningEntry = sliceData[winnerIdx];
+  //set the winner entry
+  wheelState$.winningEntry.set(winningEntry);
   //build the wheel offsets so we can choose a random angle
   const wheelOffsets = buildWheelOffsets(sliceData);
-  const idx = sliceData.findIndex((slice) => slice.id === winnerSlice.id);
+  const idx = sliceData.findIndex((slice) => slice.id === winningEntry.id);
   //set the rotation to the random angle
   const newAngle =
     getRandomFloat(wheelOffsets[idx].start, wheelOffsets[idx].end) * 360;
@@ -80,7 +87,7 @@ function doSpin(
   wheelState$.isRotating.set(true);
   setTimeout(() => {
     console.log("SET IS WINNER");
-    setIsWinner(winnerSlice.id, true);
+    setIsWinner(winningEntry.id, true);
     open();
     fireworks();
     wheelState$.isRotating.set(false);

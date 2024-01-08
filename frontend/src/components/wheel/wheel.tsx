@@ -1,22 +1,22 @@
 // import { faker } from '@faker-js/faker'
-import { Slice } from "./slice/slice";
-import { SliceData } from "./types";
+import { EntryProps } from "@shared/types";
+import { SliceText } from "./slice/slice-text";
 import { buildWheelOffsets, buildWheelSVG } from "./wheel-svg-generator";
 import styles from "./wheel.module.scss";
 import { observer } from "@legendapp/state/react";
 import { Text, Tooltip } from "@mantine/core";
 interface WheelProps {
-  sliceData: SliceData[];
+  wheelEntries: EntryProps[];
   rotation: number;
 }
-export const Wheel = observer(({ sliceData, rotation }: WheelProps) => {
-  const wheelOffsets = buildWheelOffsets(sliceData);
-  const svgMarkup = buildWheelSVG(sliceData);
+export const Wheel = observer(({ wheelEntries, rotation }: WheelProps) => {
+  const wheelOffsets = buildWheelOffsets(wheelEntries);
+  const svgMarkup = buildWheelSVG(wheelEntries);
   const base64SVG = btoa(svgMarkup);
   const backgroundImage = `url('data:image/svg+xml;base64,${base64SVG}')`;
   const largestFontSize = 27;
   const smallestFontSize = 16;
-  if (sliceData.length === 0)
+  if (wheelEntries.length === 0)
     return (
       <div className={styles["c-wheel"]}>
         <Text size="xl">Add some items to the wheel!</Text>
@@ -33,7 +33,7 @@ export const Wheel = observer(({ sliceData, rotation }: WheelProps) => {
         }}
       >
         <div className={styles["slices-container"]}>
-          {sliceData.map((slice, idx) => {
+          {wheelEntries.map((slice, idx) => {
             const rotation = wheelOffsets[idx].mid * 360;
             const j = largestFontSize - smallestFontSize;
             const fontSize =
@@ -42,13 +42,13 @@ export const Wheel = observer(({ sliceData, rotation }: WheelProps) => {
                 j * (j / (slice.text.length + j)) + smallestFontSize
               ) + "px";
             return (
-              <Slice key={slice.id} rotation={rotation}>
+              <SliceText key={slice.id} rotation={rotation}>
                 <Tooltip label={slice.text} color="dark">
                   <Text style={{ fontSize }} lineClamp={1}>
                     {slice.text}
                   </Text>
                 </Tooltip>
-              </Slice>
+              </SliceText>
             );
           })}
         </div>

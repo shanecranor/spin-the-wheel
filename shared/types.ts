@@ -3,6 +3,7 @@ export interface EntryProps {
   text: string;
   author: string;
   isSafe: boolean;
+  weight?: number;
   isOnWheel: boolean;
   isWinner?: boolean;
 }
@@ -14,7 +15,8 @@ export const isEntryProps = (input: any): input is EntryProps => {
     typeof input.author === "string" &&
     typeof input.isSafe === "boolean" &&
     typeof input.isOnWheel === "boolean" &&
-    typeof input.isWinner === "boolean"
+    typeof input.isWinner === "boolean" &&
+    typeof input.weight === "number"
   );
 };
 

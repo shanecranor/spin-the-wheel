@@ -4,7 +4,7 @@ interface SliceProps {
   children: React.ReactNode;
   rotation: number;
 }
-export const Slice = ({ children, rotation }: SliceProps) => {
+export const SliceText = ({ children, rotation }: SliceProps) => {
   return (
     <div
       className={styles["c-slice"]}

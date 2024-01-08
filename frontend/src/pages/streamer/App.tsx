@@ -6,7 +6,6 @@ import { EntryManager } from "../../components/entry-manager/entry-manager";
 import { WheelSpinner } from "../../components/wheel-spinner/wheel-spinner";
 import { getEntries } from "../../state/entry-state";
 import { observer } from "@legendapp/state/react";
-import { SliceData } from "../../components/wheel/types";
 import { AppShell, Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { localCommands } from "../../state/local-commands";
@@ -53,7 +52,7 @@ const App = observer(() => {
         <div className="wheel">
           <div className="wheel-container">
             <WheelSpinner
-              slices={getActiveSlices(getEntries())}
+              wheelEntries={getActiveSlices(getEntries())}
               setIsWinner={commands.setIsWinner}
               setIsOnWheel={commands.setIsOnWheel}
             />
@@ -114,13 +113,6 @@ const App = observer(() => {
 });
 
 function getActiveSlices(entries: EntryProps[]) {
-  const activeEntries = entries.filter((entry) => entry.isOnWheel);
-  return activeEntries.map(
-    (entry: EntryProps): SliceData => ({
-      id: entry.id,
-      text: entry.text,
-      weight: 1,
-    })
-  );
+  return entries.filter((entry) => entry.isOnWheel);
 }
 export default App;

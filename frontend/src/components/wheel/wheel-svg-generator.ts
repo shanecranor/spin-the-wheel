@@ -1,4 +1,5 @@
-import { SliceData } from "./types";
+import { EntryProps } from "@shared/types";
+
 export const WHEEL_COLORS = [
   "#746EE0",
   "#7FC9F3",
@@ -7,13 +8,13 @@ export const WHEEL_COLORS = [
   "#F2982C",
   "#FADD81",
 ];
-export function buildWheelOffsets(sliceData: SliceData[]) {
+export function buildWheelOffsets(sliceData: EntryProps[]) {
   const totalSliceWeight = sliceData.reduce(
-    (acc, slice) => acc + slice.weight,
+    (acc, slice) => acc + (slice.weight || 1),
     0
   );
   const sliceWeights = sliceData.map(
-    (slice) => slice.weight / totalSliceWeight
+    (slice) => (slice.weight || 1) / totalSliceWeight
   );
   const gradient = sliceWeights.map((weight, idx) => {
     const color = WHEEL_COLORS[idx % 6];
@@ -69,7 +70,7 @@ function describeArc(
   ].join(" ");
 }
 
-export function buildWheelSVG(sliceData: SliceData[]) {
+export function buildWheelSVG(sliceData: EntryProps[]) {
   const wheelOffsets = buildWheelOffsets(sliceData);
   const centerX = 100;
   const centerY = 100;
@@ -133,7 +134,7 @@ export function buildWheelSVG(sliceData: SliceData[]) {
           </svg>`;
 }
 
-export function buildWheelGradient(sliceData: SliceData[]) {
+export function buildWheelGradient(sliceData: EntryProps[]) {
   const wheelOffsets = buildWheelOffsets(sliceData);
   const gradient = wheelOffsets.map(
     ({ color, start, end }) =>

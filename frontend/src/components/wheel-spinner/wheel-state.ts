@@ -1,12 +1,13 @@
 import { observable } from "@legendapp/state";
+import { EntryProps } from "@shared/types";
 
 export interface WheelState {
   rotation: number;
-  selectedItemId: string | null;
+  winningEntry: EntryProps | null;
   isRotating: boolean;
 }
 export const wheelState$ = observable<WheelState>({
   rotation: 0,
-  selectedItemId: null,
+  winningEntry: null,
   isRotating: false,
 });
