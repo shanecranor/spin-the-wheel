@@ -4,7 +4,7 @@ import { wheelState$ } from "./wheel-state";
 import { WHEEL_COLORS, buildWheelOffsets } from "../wheel/wheel-svg-generator";
 import styles from "./wheel-spinner.module.scss";
 import { useDisclosure } from "@mantine/hooks";
-import { Button, Modal, Text } from "@mantine/core";
+import { Button, Group, Modal, Stack, Text, Title } from "@mantine/core";
 import confetti from "canvas-confetti";
 import { EntryIdBoolFunction } from "../../state/commands";
 import { EntryProps } from "@shared/types";
@@ -37,24 +37,33 @@ export const WheelSpinner = observer(
         >
           Spin me
         </Button>
-        <Modal opened={opened} onClose={close} title="Winner!!" centered>
-          <Text>
-            The wheel chooses{" "}
-            {
-              wheelEntries.find(
-                (item) => item.id == wheelState$.winningEntry.id.get()
-              )?.text
-            }
-          </Text>
-          <Text></Text>
-          <Button
-            onClick={() => {
-              setIsOnWheel(wheelState$.winningEntry.id.peek(), false);
-              close();
-            }}
-          >
-            Remove Winner
-          </Button>
+        <Modal
+          opened={opened}
+          onClose={close}
+          centered
+          withCloseButton={false}
+          shadow="lg"
+        >
+          <Stack px="sm" pt="xs">
+            <Title size="h2" component="p">
+              {wheelState$.winningEntry.text.get()}
+            </Title>
+            <Text>Submitted by {wheelState$.winningEntry.author.get()}</Text>
+            {/* TODO: maybe show the users badges and chat name color? */}
+          </Stack>
+          <Group mt="md" justify="flex-end">
+            <Button onClick={close} color="gray.7">
+              Close
+            </Button>
+            <Button
+              onClick={() => {
+                setIsOnWheel(wheelState$.winningEntry.id.peek(), false);
+                close();
+              }}
+            >
+              Remove Entry
+            </Button>
+          </Group>
         </Modal>
       </div>
     );
@@ -86,7 +95,6 @@ function doSpin(
   );
   wheelState$.isRotating.set(true);
   setTimeout(() => {
-    console.log("SET IS WINNER");
     setIsWinner(winningEntry.id, true);
     open();
     fireworks();
