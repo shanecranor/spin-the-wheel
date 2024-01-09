@@ -3,6 +3,8 @@
   flex-direction: row;
   gap: 8px;
   padding: 4px;
+  //center
+  align-items: center;
   transition: all 0.2s ease-in-out;
   //var(--mantine-color-green-3);
 
@@ -20,6 +22,10 @@
       var(--mantine-color-dark-8) 80%,
       var(--mantine-color-yellow-3) 20%
     );
+  }
+  > .party-icon {
+    font-size: 32px;
+    margin-left: 8px;
   }
   > .entry-text {
     margin-left: 8px;

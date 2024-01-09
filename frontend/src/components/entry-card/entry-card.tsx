@@ -1,17 +1,5 @@
-import {
-  // Checkbox,
-  // CheckboxProps,
-  Paper,
-  Text,
-  ActionIcon,
-} from "@mantine/core";
-import {
-  // IconAdjustments,
-  IconX,
-  IconCheck,
-  IconPlus,
-  IconTrash,
-} from "@tabler/icons-react";
+import { Paper, Text, ActionIcon } from "@mantine/core";
+import { IconX, IconCheck, IconPlus, IconTrash } from "@tabler/icons-react";
 import styles from "./entry-card.module.scss";
 import { EntryProps } from "@shared/types";
 import { EntryIdBoolFunction, EntryIdFunction } from "../../state/commands";
@@ -102,6 +90,7 @@ export const EntryCard = ({
         isWinner && "winner"
       }`}
     >
+      <div className={styles["party-icon"]}>{isWinner && "🎉 "}</div>
       <div className={styles["entry-text"]}>
         <Text size="lg">{text}</Text>
         <Text size="xs">{author}</Text>
