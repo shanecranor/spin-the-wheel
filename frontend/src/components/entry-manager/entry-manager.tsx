@@ -43,9 +43,13 @@ export const EntryManager = ({ stateFunctions }: EntryManagerProps) => {
     <div className={styles["c-entry-manager"]}>
       <Tabs defaultValue="submissions">
         <Tabs.List grow>
-          <Tabs.Tab value="wheel-items">Wheel Items</Tabs.Tab>
-          <Tabs.Tab value="submissions">Submissions</Tabs.Tab>
-          <Tabs.Tab value="winners">Past Winners</Tabs.Tab>
+          <Tabs.Tab value="wheel-items">
+            On Wheel ({wheelItems.length})
+          </Tabs.Tab>
+          <Tabs.Tab value="submissions">
+            Submissions ({submissions.length + unsafe.length})
+          </Tabs.Tab>
+          <Tabs.Tab value="winners">Past Winners ({winners.length})</Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="wheel-items" className={styles["entry-tab"]}>
@@ -64,7 +68,9 @@ export const EntryManager = ({ stateFunctions }: EntryManagerProps) => {
           </Paper>
           <Accordion defaultValue={["mod-approved"]} multiple>
             <Accordion.Item value="mod-approved">
-              <Accordion.Control>Approved</Accordion.Control>
+              <Accordion.Control>
+                Approved ({submissions.length})
+              </Accordion.Control>
               <Accordion.Panel>
                 <SimpleGrid cols={1} spacing="sm">
                   {submissions.length === 0 ? (
@@ -76,7 +82,9 @@ export const EntryManager = ({ stateFunctions }: EntryManagerProps) => {
               </Accordion.Panel>
             </Accordion.Item>
             <Accordion.Item value="dangerous">
-              <Accordion.Control>Unreviewed</Accordion.Control>
+              <Accordion.Control>
+                Unreviewed ({unsafe.length})
+              </Accordion.Control>
               <Accordion.Panel>
                 <SimpleGrid cols={1} spacing="sm">
                   {unsafe.length === 0 ? (
