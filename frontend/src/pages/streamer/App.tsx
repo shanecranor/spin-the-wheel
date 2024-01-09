@@ -30,9 +30,9 @@ const App = observer(() => {
       padding="md"
       // header={{ height: 60 }}
       aside={{
-        width: 400,
+        width: 500,
         breakpoint: "sm",
-        collapsed: { mobile: !isSidebarOpen, desktop: !isSidebarOpen },
+        collapsed: { mobile: isSidebarOpen, desktop: isSidebarOpen },
       }}
     >
       {/* <AppShell.Header>Header</AppShell.Header> */}
@@ -74,7 +74,7 @@ const App = observer(() => {
             </div>
           </div>
         </div>
-        {!isSidebarOpen && (
+        {isSidebarOpen && (
           <Button className="sidebar-button" m="sm" onClick={toggleDesktop}>
             open wheel manager
           </Button>
