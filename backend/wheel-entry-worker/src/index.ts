@@ -107,6 +107,11 @@ export class WheelEntries {
 		let entries = Array.from((await this.storage.list<EntryProps>()).values());
 		serverWebSocket.send(JSON.stringify({ command, entries }));
 	}
+
+	async setRules(rules: string) {
+		await this.storage.put('gameRules', rules);
+		this.broadcast(rules);
+	}
 	// Handle requests sent to the Durable Object
 	async fetch(request: Request) {
 		// Apply requested command.

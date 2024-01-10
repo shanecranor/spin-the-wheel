@@ -44,14 +44,19 @@ export const WheelSpinner = observer(
           withCloseButton={false}
           shadow="lg"
         >
-          <Stack px="sm" pt="xs">
-            <Title size="h2" component="p">
-              {wheelState$.winningEntry.text.get()}
+          <Group>
+            <Title mx="sm" component="div">
+              🎉
             </Title>
-            <Text>Submitted by {wheelState$.winningEntry.author.get()}</Text>
-            {/* TODO: maybe show the users badges and chat name color? */}
-          </Stack>
-          <Group mt="md" justify="flex-end">
+            <Stack pr="sm" pt="xs">
+              <Title size="h2" component="p">
+                {wheelState$.winningEntry.text.get()}
+              </Title>
+              <Text>Submitted by {wheelState$.winningEntry.author.get()}</Text>
+              {/* TODO: maybe show the users badges and chat name color? */}
+            </Stack>
+          </Group>
+          <Group mt="xl" justify="flex-end">
             <Button onClick={close} color="gray.7">
               Close
             </Button>

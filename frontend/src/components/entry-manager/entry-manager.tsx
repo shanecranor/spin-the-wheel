@@ -1,4 +1,11 @@
-import { Accordion, Paper, SimpleGrid, Tabs, Text } from "@mantine/core";
+import {
+  Accordion,
+  Paper,
+  SimpleGrid,
+  Spoiler,
+  Tabs,
+  Text,
+} from "@mantine/core";
 import { EntryCard } from "../entry-card/entry-card";
 import styles from "./entry-manager.module.scss";
 import { getEntries } from "../../state/entry-state";
@@ -66,7 +73,7 @@ export const EntryManager = ({ stateFunctions }: EntryManagerProps) => {
           <Paper m="md" p="md" withBorder>
             <EntryCreator createEntry={createEntry} />
           </Paper>
-          <Accordion defaultValue={["mod-approved"]} multiple>
+          <Accordion defaultValue={["mod-approved", "dangerous"]} multiple>
             <Accordion.Item value="mod-approved">
               <Accordion.Control>
                 Approved ({submissions.length})
@@ -86,13 +93,27 @@ export const EntryManager = ({ stateFunctions }: EntryManagerProps) => {
                 Unreviewed ({unsafe.length})
               </Accordion.Control>
               <Accordion.Panel>
-                <SimpleGrid cols={1} spacing="sm">
-                  {unsafe.length === 0 ? (
-                    <Text size="lg">no new unreviewed submissions </Text>
-                  ) : (
-                    unsafe
-                  )}
-                </SimpleGrid>
+                <a
+                  href="/moderator/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  target-new="window"
+                >
+                  Open unreviewed entries in a new window (hidden from stream)
+                </a>
+                {unsafe.length === 0 ? (
+                  <Text size="lg">no new unreviewed submissions </Text>
+                ) : (
+                  <Spoiler
+                    maxHeight={0}
+                    showLabel="Show unreviewed submissions (be careful if you are streaming)"
+                    hideLabel="Hide unreviewed submissions"
+                  >
+                    <SimpleGrid cols={1} spacing="sm">
+                      {unsafe}
+                    </SimpleGrid>
+                  </Spoiler>
+                )}
               </Accordion.Panel>
             </Accordion.Item>
           </Accordion>
