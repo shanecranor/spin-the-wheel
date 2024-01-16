@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@0no-co/graphql.web@^1.0.1":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@0no-co/graphql.web/-/graphql.web-1.0.4.tgz#9606eb651955499525d068ce0ad8bea596286ce2"
+  integrity sha512-W3ezhHGfO0MS1PtGloaTpg0PbaT8aZSmmaerL7idtU5F7oCI+uu25k+MsMS31BVFlp4aMkHSrNRxiD72IlK8TA==
+
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"
   resolved "https://registry.npmjs.org/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz"
@@ -183,6 +188,13 @@
   version "7.23.6"
   resolved "https://registry.npmjs.org/@babel/runtime/-/runtime-7.23.6.tgz"
   integrity sha512-zHd0eUrf5GZoOWVCXp6koAKQTfZV07eit6bGPmJgnZdnSAvvZee6zniW2XMF7Cmc4ISOOnPy3QaSiIJGJkVEDQ==
+  dependencies:
+    regenerator-runtime "^0.14.0"
+
+"@babel/runtime@^7.5.5", "@babel/runtime@^7.8.7":
+  version "7.23.8"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.23.8.tgz#8ee6fe1ac47add7122902f257b8ddf55c898f650"
+  integrity sha512-Y7KbAP984rn1VGMbGqKmBLio9V7y5Je9GvU4rQPCPinCyNfUcToxIXl06d59URp/F3LwinvODxab5N/G6qggkw==
   dependencies:
     regenerator-runtime "^0.14.0"
 
@@ -483,6 +495,19 @@
   resolved "https://registry.npmjs.org/@mantine/hooks/-/hooks-7.3.2.tgz"
   integrity sha512-xgumuuI3PBWXff5N02HCI7PEy25mDEdyXDQklUYK93J6FKwpcosyZnGVitoUrV1gLtYYa9ZudeAWdhHuh/CpOg==
 
+"@mantine/notifications@^7.4.1":
+  version "7.4.1"
+  resolved "https://registry.yarnpkg.com/@mantine/notifications/-/notifications-7.4.1.tgz#a92e41bcca287e27b477ca5bf38072489e015b02"
+  integrity sha512-tDp2le/CsX7l8X4Kgx7eUQ2tdC8Z8cscPjRv2RPlkXI6giFYp0agOvc3BhwxED8xFDNZC4BkC+uoOonB9XTmdg==
+  dependencies:
+    "@mantine/store" "7.4.1"
+    react-transition-group "4.4.5"
+
+"@mantine/store@7.4.1":
+  version "7.4.1"
+  resolved "https://registry.yarnpkg.com/@mantine/store/-/store-7.4.1.tgz#b28fec5083e5b18224b1340689350a2d2bc9a8e6"
+  integrity sha512-BWU2b+t8Rnlc+GsPMEhGzU0hzZIuf58miZvxDXDnXr8NcBubSPhoR97bSFQ81UAvDAczI4xqOQi8vVUcoKa+ng==
+
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.npmjs.org/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz"
@@ -581,6 +606,23 @@
   version "2.44.0"
   resolved "https://registry.npmjs.org/@tabler/icons/-/icons-2.44.0.tgz"
   integrity sha512-WPPtihDcAwEm1QZM9MXQw6+r/R2/qx7KMU1eegsi9DsqBLAb0W2kbt6e/syvd6j9c+6XNpRVBW1ziGqSWQAWOg==
+
+"@trufflehq/sdk@^0.4.15":
+  version "0.4.15"
+  resolved "https://registry.yarnpkg.com/@trufflehq/sdk/-/sdk-0.4.15.tgz#73f76328c69dfab54c60216a26da016cf8a0515c"
+  integrity sha512-DQ7phoMbR9KfmGF8Q1aDw3qx1xkvm9BMuPzk7lnNt2L2cHd5W5111l0M/WSZyetbgVxXC33XztkA3r7/VCDcEA==
+  dependencies:
+    "@trufflehq/transframe" "^0.1.0"
+    "@urql/core" "^3.1.1"
+    "@urql/exchange-auth" "^1.0.0"
+    graphql "^16.8.0"
+    graphql-ws "^5.13.1"
+    wonka "^6.1.2"
+
+"@trufflehq/transframe@^0.1.0":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@trufflehq/transframe/-/transframe-0.1.2.tgz#c1cf8a29ad43eb411b8a638cf93eca4abf012f27"
+  integrity sha512-+UFRL/icNhd+G58vd8AQT8FDgMNhcv4atluCG9YIsBykqyuTfcOXZyfEmGk1Y4XCJTkZ/FKU+VZb3Sdelju0iw==
 
 "@types/babel__core@^7.20.5":
   version "7.20.5"
@@ -745,6 +787,29 @@
   version "1.2.0"
   resolved "https://registry.npmjs.org/@ungap/structured-clone/-/structured-clone-1.2.0.tgz"
   integrity sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==
+
+"@urql/core@>=3.0.0":
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/@urql/core/-/core-4.2.2.tgz#c2b009373cb9084bbfa8ebc0177c854a76235b84"
+  integrity sha512-TP1kheq9bnrEdnVbJqh0g0ZY/wfdpPeAzjiiDK+Tm+Pbi0O1Xdu6+fUJ/wJo5QpHZzkIyya4/AecG63e6scFqQ==
+  dependencies:
+    "@0no-co/graphql.web" "^1.0.1"
+    wonka "^6.3.2"
+
+"@urql/core@^3.1.1":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@urql/core/-/core-3.2.2.tgz#2a44015b536d72981822f715c96393d8e0ddc576"
+  integrity sha512-i046Cz8cZ4xIzGMTyHZrbdgzcFMcKD7+yhCAH5FwWBRjcKrc+RjEOuR9X5AMuBvr8c6IAaE92xAqa4wmlGfWTQ==
+  dependencies:
+    wonka "^6.1.2"
+
+"@urql/exchange-auth@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@urql/exchange-auth/-/exchange-auth-1.0.0.tgz#cf846189632662330b616704387b1cf762561638"
+  integrity sha512-79hqPQab+ifeINOxvQykvqub4ixWHBEIagN4U67ijcHGMfp3c4yEWRk4IJMPwF+OMT7LrRFuv+jRIZTQn/9VwQ==
+  dependencies:
+    "@urql/core" ">=3.0.0"
+    wonka "^6.0.0"
 
 "@vitejs/plugin-react@^4.2.1":
   version "4.2.1"
@@ -996,6 +1061,14 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
+
+dom-helpers@^5.0.1:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-5.2.1.tgz#d9400536b2bf8225ad98fe052e029451ac40e902"
+  integrity sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA==
+  dependencies:
+    "@babel/runtime" "^7.8.7"
+    csstype "^3.0.2"
 
 electron-to-chromium@^1.4.601:
   version "1.4.616"
@@ -1289,6 +1362,16 @@ graphemer@^1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/graphemer/-/graphemer-1.4.0.tgz"
   integrity sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==
+
+graphql-ws@^5.13.1:
+  version "5.14.3"
+  resolved "https://registry.yarnpkg.com/graphql-ws/-/graphql-ws-5.14.3.tgz#fb1fba011a0ae9c4e86d831cae2ec27955168b9a"
+  integrity sha512-F/i2xNIVbaEF2xWggID0X/UZQa2V8kqKDPO8hwmu53bVOcTL7uNkxnexeEgSCVxYBQUTUNEI8+e4LO1FOhKPKQ==
+
+graphql@^16.8.0:
+  version "16.8.1"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.8.1.tgz#1930a965bef1170603702acdb68aedd3f3cf6f07"
+  integrity sha512-59LZHPdGZVh695Ud9lRzPBVTtlX9ZCV150Er2W43ro37wVof0ctenSaskPPjN7lVTIN8mSZt8PHUNKZuNQUuxw==
 
 has-flag@^3.0.0:
   version "3.0.0"
@@ -1641,7 +1724,7 @@ prelude-ls@^1.2.1:
   resolved "https://registry.npmjs.org/prelude-ls/-/prelude-ls-1.2.1.tgz"
   integrity sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==
 
-prop-types@^15.7.2:
+prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.8.1"
   resolved "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -1721,6 +1804,16 @@ react-textarea-autosize@8.5.3:
     "@babel/runtime" "^7.20.13"
     use-composed-ref "^1.3.0"
     use-latest "^1.2.1"
+
+react-transition-group@4.4.5:
+  version "4.4.5"
+  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.5.tgz#e53d4e3f3344da8521489fbef8f2581d42becdd1"
+  integrity sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==
+  dependencies:
+    "@babel/runtime" "^7.5.5"
+    dom-helpers "^5.0.1"
+    loose-envify "^1.4.0"
+    prop-types "^15.6.2"
 
 react@^18.2.0:
   version "18.2.0"
@@ -1994,6 +2087,11 @@ which@^2.0.1:
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
   dependencies:
     isexe "^2.0.0"
+
+wonka@^6.0.0, wonka@^6.1.2, wonka@^6.3.2:
+  version "6.3.4"
+  resolved "https://registry.yarnpkg.com/wonka/-/wonka-6.3.4.tgz#76eb9316e3d67d7febf4945202b5bdb2db534594"
+  integrity sha512-CjpbqNtBGNAeyNS/9W6q3kSkKE52+FjIj7AkFlLr11s/VWGUu6a2CdYSdGxocIhIVjaW/zchesBQUKPVU69Cqg==
 
 wrappy@1:
   version "1.0.2"

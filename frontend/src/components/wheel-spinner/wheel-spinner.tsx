@@ -13,10 +13,12 @@ export const WheelSpinner = observer(
     wheelEntries,
     setIsWinner,
     setIsOnWheel,
+    children,
   }: {
     wheelEntries: EntryProps[];
     setIsWinner: EntryIdBoolFunction;
     setIsOnWheel: EntryIdBoolFunction;
+    children?: React.ReactNode;
   }) => {
     const [opened, { open, close }] = useDisclosure(false);
     return (
@@ -25,18 +27,28 @@ export const WheelSpinner = observer(
           <Wheel
             wheelEntries={wheelEntries}
             rotation={wheelState$.rotation.get()}
+            emptyState={
+              <Text size="xl">
+                Add some items to the wheel! <br></br> Enable or disable
+                submissions by clicking on the settings cog
+              </Text>
+            }
           />
           <div className={styles["wheel-indicator"]}>◄</div>{" "}
           {/* ◀ for for rounding*/}
         </div>
-        <Button
-          m="md"
-          size="lg"
-          onClick={() => doSpin(wheelEntries, open, setIsWinner)}
-          disabled={wheelEntries.length === 0 || wheelState$.isRotating.get()}
-        >
-          Spin me
-        </Button>
+        <Group justify="center">
+          <Button
+            m="md"
+            size="lg"
+            onClick={() => doSpin(wheelEntries, open, setIsWinner)}
+            disabled={wheelEntries.length === 0 || wheelState$.isRotating.get()}
+          >
+            Spin me
+          </Button>
+          {children}
+        </Group>
+
         <Modal
           opened={opened}
           onClose={close}

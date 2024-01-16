@@ -2,7 +2,9 @@ import { localCommands } from "./local-commands";
 import { entryState$, mapFromEntries } from "./entry-state";
 import { observable } from "@legendapp/state";
 import { WSMessage } from "@shared/websocket-types";
-
+import { Command, GlobalParamSettingCommand } from "../../../shared/types";
+import { notifications } from "@mantine/notifications";
+import { globalState$ } from "./global-state";
 export const webSocket$ = observable<WebSocket | null>(null);
 
 export function startWebSockets() {
@@ -49,47 +51,106 @@ export function handleWebSocketEvent(data: WSMessage) {
     return;
   }
   switch (data.command) {
-    case "Get data":
+    case Command.GetData:
       if (!data.entries) {
         console.error("No entries to load");
         return;
       }
       entryState$.set(mapFromEntries(data.entries));
+      globalState$.set((old) => ({
+        ...old,
+        rules: data.rules,
+        isGameStarted: data.isGameStarted,
+        isAcceptingEntries: data.isAcceptingEntries,
+      }));
       break;
-    case "Create":
+    case GlobalParamSettingCommand.SetRules:
+      if (!data.value) {
+        console.error("No rules provided");
+        return;
+      }
+      notifications.show({
+        title: "Rules updated",
+        message: "Rules have been updated",
+      });
+      localCommands.setRules(data.value);
+      break;
+    case GlobalParamSettingCommand.SetIsAcceptingEntries:
+    case GlobalParamSettingCommand.SetIsGameStarted:
+      if (!("value" in data)) {
+        console.error("No value provided");
+        return;
+      }
+      if (typeof data.value !== "boolean") {
+        console.error(`Invalid value (${data.value}) provided`);
+        return;
+      }
+      notifications.show({
+        title: data.command,
+        message: "Value updated to" + data.value ? "true" : "false",
+      });
+      handleGlobalCommand(data.command, data.value);
+      break;
+    case Command.Create:
       if (!data.entry) {
         console.error("No entry data provided");
         return;
       }
       localCommands.createEntry(data.entry);
       break;
-    case "Delete":
+    case Command.Delete:
       if (!data.id) {
         console.error("No entry ID provided");
         return;
       }
       localCommands.deleteEntry(data.id);
       break;
-    case "setIsSafe":
+    case Command.SetIsSafe:
+    case Command.SetIsOnWheel:
+    case Command.SetIsWinner:
       if (!data.id) {
         console.error("No entry ID provided");
         return;
       }
-      localCommands.setIsSafe(data.id, true);
+      if (data.value === undefined) {
+        console.error("No value provided");
+        return;
+      }
+      handleEntryCommand(data.command, data.id, data.value);
       break;
-    case "setIsOnWheel":
-      if (!data.id) {
-        console.error("No entry ID provided");
-        return;
-      }
-      localCommands.setIsOnWheel(data.id, data.value);
-      break;
-    case "setIsWinner":
-      if (!data.id) {
-        console.error("No entry ID provided");
-        return;
-      }
-      localCommands.setIsWinner(data.id, data.value);
+    default:
+      //this should never happen... but just in case
+      console.error("Invalid command:", data);
       break;
   }
+}
+
+function handleGlobalCommand(
+  command: GlobalParamSettingCommand,
+  value: boolean
+) {
+  switch (command) {
+    case GlobalParamSettingCommand.SetIsAcceptingEntries:
+      localCommands.setIsAcceptingEntries(value);
+      return;
+    case GlobalParamSettingCommand.SetIsGameStarted:
+      localCommands.setIsGameStarted(value);
+      return;
+  }
+  console.error("Invalid global command:", command);
+}
+
+function handleEntryCommand(command: Command, id: string, value: boolean) {
+  switch (command) {
+    case Command.SetIsSafe:
+      localCommands.setIsSafe(id, value);
+      return;
+    case Command.SetIsOnWheel:
+      localCommands.setIsOnWheel(id, value);
+      return;
+    case Command.SetIsWinner:
+      localCommands.setIsWinner(id, value);
+      return;
+  }
+  console.error("Invalid entry command:", command);
 }

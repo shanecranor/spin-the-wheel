@@ -93,14 +93,16 @@ export const EntryManager = ({ stateFunctions }: EntryManagerProps) => {
                 Unreviewed ({unsafe.length})
               </Accordion.Control>
               <Accordion.Panel>
-                <a
-                  href="/moderator/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  target-new="window"
-                >
-                  Open unreviewed entries in a new window (hidden from stream)
-                </a>
+                <Text mb="lg" mt="8px">
+                  <a
+                    href="/moderator/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    target-new="window"
+                  >
+                    Open unreviewed entries in a new window (hidden from stream)
+                  </a>
+                </Text>
                 {unsafe.length === 0 ? (
                   <Text size="lg">no new unreviewed submissions </Text>
                 ) : (

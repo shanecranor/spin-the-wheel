@@ -1,18 +1,22 @@
-import { Command, EntryProps } from "@shared/types";
+import { Command, EntryProps, GlobalParamSettingCommand } from "@shared/types";
 
-type ValidatedCommand<T extends Command> = T;
 export interface CreateMessage {
-  command: ValidatedCommand<"Create">;
+  command: Command.Create;
   entry: EntryProps;
 }
+
+export interface SetGlobalParamMessage {
+  command: GlobalParamSettingCommand;
+  value: any;
+}
 export interface SetterMessage {
-  command: ValidatedCommand<"setIsSafe" | "setIsOnWheel" | "setIsWinner">;
+  command: Command.SetIsSafe | Command.SetIsOnWheel | Command.SetIsWinner;
   id: string;
   value: boolean;
 }
 
 export interface DeleteMessage {
-  command: ValidatedCommand<"Delete">;
+  command: Command.Delete;
   id: string;
 }
 
@@ -21,13 +25,17 @@ export interface ErrorMessage {
 }
 
 export interface GetDataMessage {
-  command: ValidatedCommand<"Get data">;
+  isGameStarted: boolean;
+  isAcceptingEntries: boolean;
+  command: Command.GetData;
   entries: EntryProps[];
+  rules: string;
 }
 
 export type WSMessage =
   | CreateMessage
   | SetterMessage
+  | SetGlobalParamMessage
   | DeleteMessage
   | GetDataMessage
   | ErrorMessage;

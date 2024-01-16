@@ -6,17 +6,36 @@ import { EntryManager } from "../../components/entry-manager/entry-manager";
 import { WheelSpinner } from "../../components/wheel-spinner/wheel-spinner";
 import { getEntries } from "../../state/entry-state";
 import { observer } from "@legendapp/state/react";
-import { AppShell, Button } from "@mantine/core";
+import {
+  AppShell,
+  Button,
+  Modal,
+  Textarea,
+  Text,
+  Title,
+  Stack,
+  Switch,
+  Group,
+  ActionIcon,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { localCommands } from "../../state/local-commands";
 import { EntryProps } from "@shared/types";
 import { webSocketCommands } from "../../state/websocket-commands";
 import { CommandFunctions } from "../../state/commands";
 import { startWebSockets } from "../../state/websocket-manager";
+import { globalState$ } from "../../state/global-state";
+import { IconSettings } from "@tabler/icons-react";
 // import { IconSettings } from "@tabler/icons-react";
 const App = observer(() => {
   // const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [isSidebarOpen, { toggle: toggleDesktop }] = useDisclosure();
+  const [settingsOpened, { open: openSettings, close: closeSettings }] =
+    useDisclosure(true);
+  const closeSettingsAndSave = () => {
+    commands.setRules(globalState$.rules.get());
+    closeSettings();
+  };
   const params = new URLSearchParams(window.location.search);
   const mode = params.get("mode") || "websockets";
   if (mode === "websockets") {
@@ -49,29 +68,94 @@ const App = observer(() => {
         <EntryManager stateFunctions={commands} />
       </AppShell.Aside>
       <AppShell.Main>
+        <Modal
+          opened={settingsOpened}
+          onClose={closeSettingsAndSave}
+          size="lg"
+          withCloseButton={false}
+          centered
+        >
+          <Stack p="lg">
+            <Title>Game Settings</Title>
+            <Textarea
+              size="md"
+              label="Rules/Criteria"
+              description="What can viewers submit? (and what shouldn't they submit)"
+              placeholder="No rules yet"
+              minRows={2}
+              autosize
+              value={globalState$.rules.get()}
+              onChange={(event) => {
+                globalState$.rules.set(event.currentTarget.value);
+              }}
+            />
+            <Title order={2}>Game Status</Title>
+            <div>
+              <Group>
+                <Switch
+                  label={
+                    <Text>
+                      Viewer entry submissions are currently{" "}
+                      <Text c="pink" span>
+                        {globalState$.isAcceptingEntries.get()
+                          ? "enabled"
+                          : "disabled"}
+                      </Text>
+                    </Text>
+                  }
+                  checked={globalState$.isAcceptingEntries.get()}
+                  onChange={(event) => {
+                    commands.setIsAcceptingEntries(event.currentTarget.checked);
+                  }}
+                />
+              </Group>
+              <Switch
+                label={
+                  <Text>
+                    The game is currently{" "}
+                    <Text c="pink" span>
+                      {globalState$.isGameStarted.get()
+                        ? "started"
+                        : "not started"}
+                    </Text>
+                  </Text>
+                }
+                checked={globalState$.isGameStarted.get()}
+                onChange={(event) => {
+                  commands.setIsGameStarted(event.currentTarget.checked);
+                }}
+              />
+            </div>
+            <Group justify="end" mt="lg">
+              <Button variant="default" onClick={closeSettingsAndSave}>
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  closeSettingsAndSave();
+                  commands.setIsAcceptingEntries(true);
+                  commands.setIsGameStarted(true);
+                }}
+              >
+                Start game and enable submissions
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
         <div className="wheel">
           <div className="wheel-container">
             <WheelSpinner
               wheelEntries={getActiveSlices(getEntries())}
               setIsWinner={commands.setIsWinner}
               setIsOnWheel={commands.setIsOnWheel}
-            />
-          </div>
-          <div className="wheel-controls">
-            {/* <Button>Enable Submissions</Button>
-            <ActionIcon>
-              <IconSettings />
-            </ActionIcon> */}
-            <div className="settings">
-              {/* <button>import</button>
-            <button>export</button>
-            <button>restore removed entries</button>
-            <button>clear all submissions</button>
-            <label>
-              remove slice after spin?
-              <input type="checkbox" />
-            </label> */}
-            </div>
+            >
+              <ActionIcon size="48px" onClick={() => openSettings()}>
+                <IconSettings
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1}
+                />
+              </ActionIcon>
+            </WheelSpinner>
           </div>
         </div>
         {isSidebarOpen && (

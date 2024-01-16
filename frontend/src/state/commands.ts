@@ -10,4 +10,7 @@ export interface CommandFunctions {
   setIsOnWheel: EntryIdBoolFunction;
   setIsSafe: EntryIdBoolFunction;
   setIsWinner: EntryIdBoolFunction;
+  setRules: (rules: string) => void;
+  setIsAcceptingEntries: (isAcceptingEntries: boolean) => void;
+  setIsGameStarted: (isGameStarted: boolean) => void;
 }

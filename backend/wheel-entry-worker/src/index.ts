@@ -1,4 +1,4 @@
-import { EntryProps, Command, isEntryProps } from '@shared/types';
+import { EntryProps, Command, isEntryProps, globalParamMap, GlobalParamSettingCommand } from '@shared/types';
 import { CreateMessage, DeleteMessage, SetterMessage, WSMessage } from '@shared/websocket-types';
 import { ViewerEntryBody } from './types';
 export interface Env {
@@ -28,9 +28,13 @@ export default {
 
 // Durable Object
 
+interface WebSocketInfo {
+	id: string;
+	webSocket: WebSocket;
+}
 export class WheelEntries {
 	state: DurableObjectState;
-	webSockets: Set<WebSocket>;
+	webSockets: Set<WebSocketInfo>;
 	storage: DurableObjectStorage;
 	constructor(state: DurableObjectState, env: Env) {
 		this.state = state;
@@ -39,8 +43,8 @@ export class WheelEntries {
 	}
 	// Define the broadcast function
 	broadcast(message: string) {
-		this.webSockets.forEach((ws) => {
-			ws.send(message);
+		this.webSockets.forEach((client) => {
+			client.webSocket.send(message);
 		});
 	}
 	broadcastObject(message: WSMessage) {
@@ -57,7 +61,7 @@ export class WheelEntries {
 	}
 
 	async deleteEntry(id: string, onError: (message: string) => void) {
-		const command: Command = 'Delete';
+		const command: Command = Command.Delete;
 		const existed = await this.storage.delete(id);
 		if (!existed) {
 			onError(`${command} failed, Entry ID: ${id} not found`);
@@ -68,15 +72,16 @@ export class WheelEntries {
 	}
 
 	async createEntry(entry: EntryProps) {
+		const command: Command = Command.Create;
 		// update the storage
 		await this.storage.put(entry.id.toString(), entry);
 		// update the clients
-		const message: CreateMessage = { command: 'Create', entry };
+		const message: CreateMessage = { command, entry };
 		this.broadcastObject(message);
 	}
 
 	async setIsSafe(id: string, isSafe: boolean, onError: (message: string) => void) {
-		const command: Command = 'setIsSafe';
+		const command: Command = Command.SetIsSafe;
 		const entry = await this.getEntry(id, onError, command);
 		if (!entry) return;
 		await this.storage.put(id, { ...entry, isSafe });
@@ -85,7 +90,7 @@ export class WheelEntries {
 	}
 
 	async setIsOnWheel(id: string, isOnWheel: boolean, onError: (message: string) => void) {
-		const command: Command = 'setIsOnWheel';
+		const command: Command = Command.SetIsOnWheel;
 		const entry = await this.getEntry(id, onError, command);
 		if (!entry) return;
 		await this.storage.put(id, { ...entry, isOnWheel });
@@ -94,7 +99,7 @@ export class WheelEntries {
 	}
 
 	async setIsWinner(id: string, isWinner: boolean, onError: (message: string) => void) {
-		const command: Command = 'setIsWinner';
+		const command: Command = Command.SetIsWinner;
 		const entry = await this.getEntry(id, onError, command);
 		if (!entry) return;
 		await this.storage.put(id, { ...entry, isWinner });
@@ -103,15 +108,37 @@ export class WheelEntries {
 	}
 
 	async sendCurrentState(serverWebSocket: WebSocket) {
-		const command: Command = 'Get data';
-		let entries = Array.from((await this.storage.list<EntryProps>()).values());
-		serverWebSocket.send(JSON.stringify({ command, entries }));
+		const command: Command = Command.GetData;
+		const storageMap = await this.storage.list();
+		let globalParams = {};
+		//get each global param from the storage build a globalParams object
+		for (const key of Object.values(GlobalParamSettingCommand)) {
+			console.log('checking key', key);
+			const commandKey = key as GlobalParamSettingCommand;
+			if (!(key in globalParamMap)) {
+				console.error(`Invalid global param command ${key}`);
+				continue;
+			}
+			globalParams = { ...globalParams, [globalParamMap[commandKey]]: await this.storage.get(globalParamMap[commandKey]) };
+			console.log('globalParams', globalParams);
+			//not an Entry so delete from the entries map
+			storageMap.delete(globalParamMap[commandKey]);
+		}
+		let entries = Array.from(storageMap.values());
+		serverWebSocket.send(JSON.stringify({ command, entries, ...globalParams }));
 	}
 
-	async setRules(rules: string) {
-		await this.storage.put('gameRules', rules);
-		this.broadcast(rules);
+	async setGlobalParam(command: GlobalParamSettingCommand, value: boolean | string) {
+		if (!(command in globalParamMap)) {
+			console.error(`Invalid global param command ${command}`);
+			return;
+		}
+		await this.storage.put(globalParamMap[command], value);
+
+		const message: WSMessage = { command, value };
+		this.broadcastObject(message);
 	}
+
 	// Handle requests sent to the Durable Object
 	async fetch(request: Request) {
 		// Apply requested command.
@@ -138,7 +165,8 @@ export class WheelEntries {
 		const pair = new WebSocketPair();
 		const { 0: clientWebSocket, 1: serverWebSocket } = pair;
 		serverWebSocket.accept();
-		this.webSockets.add(serverWebSocket);
+		const serverWebSocketData = { webSocket: serverWebSocket, id: crypto.randomUUID() };
+		this.webSockets.add(serverWebSocketData);
 
 		this.sendCurrentState(serverWebSocket);
 
@@ -182,6 +210,7 @@ export class WheelEntries {
 						isSafe: eventData.entry.isSafe || false,
 						isOnWheel: eventData.entry.isOnWheel || false,
 						isWinner: eventData.entry.isWinner || false,
+						weight: eventData.entry.weight || 1,
 					};
 					if (!isEntryProps(newEntry)) {
 						sendServerError('Invalid entry data');
@@ -204,6 +233,21 @@ export class WheelEntries {
 				case 'Get data':
 					this.sendCurrentState(serverWebSocket);
 					break;
+				case 'setIsAcceptingEntries':
+				case 'setIsGameStarted':
+					if (typeof eventData.value !== 'boolean') {
+						sendServerError('Invalid value (should be a boolean)');
+						return;
+					}
+					this.setGlobalParam(eventData.command, eventData.value);
+					break;
+				case 'setRules':
+					if (typeof eventData.value !== 'string') {
+						sendServerError('Invalid rules (should be a string)');
+						return;
+					}
+					this.setGlobalParam(eventData.command, eventData.value);
+					break;
 				default:
 					sendServerError('Invalid command');
 					return;
@@ -212,7 +256,7 @@ export class WheelEntries {
 
 		// Remove the server websocket when it is closed
 		serverWebSocket.addEventListener('close', (event) => {
-			this.webSockets.delete(serverWebSocket);
+			this.webSockets.delete(serverWebSocketData);
 		});
 
 		// return the client websocket

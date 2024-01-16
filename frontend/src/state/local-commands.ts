@@ -2,8 +2,23 @@ import { EntryProps } from "@shared/types";
 // import { getRandomInt } from "../util";
 import { entryState$ } from "./entry-state";
 import { CommandFunctions } from "./commands";
+import { globalState$ } from "./global-state";
 
 export const localCommands: CommandFunctions = {
+  setRules(rules: string) {
+    globalState$.set((oldState) => ({ ...oldState, rules }));
+  },
+
+  setIsAcceptingEntries(isAcceptingEntries: boolean) {
+    console.log("setting isAcceptingEntries to", isAcceptingEntries);
+    globalState$.set((oldState) => ({ ...oldState, isAcceptingEntries }));
+  },
+
+  setIsGameStarted(isGameStarted: boolean) {
+    console.log("setting isGameStarted to", isGameStarted);
+    globalState$.set((oldState) => ({ ...oldState, isGameStarted }));
+  },
+
   createEntry(entry: EntryProps) {
     entryState$.set((oldMap) => {
       const newMap = new Map(oldMap);
