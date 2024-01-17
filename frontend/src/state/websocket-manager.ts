@@ -71,7 +71,7 @@ export function handleWebSocketEvent(data: WSMessage) {
       }
       notifications.show({
         title: "Rules updated",
-        message: "Rules have been updated",
+        message: "Rules have been updated to " + data.value,
       });
       localCommands.setRules(data.value);
       break;
