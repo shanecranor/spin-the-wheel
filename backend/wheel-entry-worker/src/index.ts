@@ -1,6 +1,7 @@
 import { EntryProps, Command, isEntryProps, globalParamMap, GlobalParamSettingCommand } from '@shared/types';
 import { CreateMessage, DeleteMessage, SetterMessage, WSMessage } from '@shared/websocket-types';
 import { ViewerEntryBody } from './types';
+import { getTruffleTokenPayload, getUserInfoFromTruffle } from './auth';
 export interface Env {
 	WHEEL_ENTRIES: DurableObjectNamespace;
 }
@@ -9,13 +10,19 @@ export interface Env {
 
 export default {
 	async fetch(request: Request, env: Env) {
-		let url = new URL(request.url);
-		let name = url.searchParams.get('name');
-		if (!name) {
-			return new Response('Select a Durable Object to contact by using the `name` URL query string parameter, for example, ?name=A');
+		//get and validate the auth token
+		const authToken = request.headers.get('Authorization');
+		if (!authToken) {
+			return new Response('Missing Authorization header', { status: 401 });
 		}
+		const accessToken = authToken.split(' ')[1];
+		if (!accessToken) {
+			return new Response('Missing access token', { status: 401 });
+		}
+		//get orgId from the access tokend to use as the durable object room id
+		const { orgId } = await getTruffleTokenPayload(accessToken);
 
-		let id = env.WHEEL_ENTRIES.idFromName(name);
+		let id = env.WHEEL_ENTRIES.idFromName(orgId);
 
 		// Construct the stub for the Durable Object using the ID.
 		// A stub is a client Object used to send messages to the Durable Object.
@@ -141,31 +148,46 @@ export class WheelEntries {
 
 	// Handle requests sent to the Durable Object
 	async fetch(request: Request) {
-		// Apply requested command.
+		const authToken = request.headers.get('Authorization');
+		if (!authToken) {
+			return new Response('Missing Authorization header', { status: 401 });
+		}
+		const accessToken = authToken.split(' ')[1];
+		if (!accessToken) {
+			return new Response('Missing access token', { status: 401 });
+		}
+
 		let url = new URL(request.url);
 		// upgrade to websockets
 		if (request.headers.get('Upgrade') !== 'websocket') {
 			//accept a regular post request for viewers adding entries (don't need to open a websocket for them)
 			if (request.method === 'POST' && url.pathname === '/add') {
-				// somehow validate that the viewer's tokens are valid
-				// and that they actually paid the spark ammount for the entry
+				const { name } = await getUserInfoFromTruffle(accessToken);
 				const body: ViewerEntryBody = await request.json();
 				const newEntry: EntryProps = {
 					id: crypto.randomUUID(),
 					text: body.text,
-					author: body.author,
+					author: name,
 					isSafe: false,
 					isOnWheel: false,
 				};
 				this.createEntry(newEntry);
+				return new Response('Sucessfully added to the wheel!', { status: 200 });
 			}
 
 			return new Response('Expected a websocket', { status: 400 });
 		}
+		//if the request is a websocket upgrade request the client needs to be a mod or admin
+		const { name, roles } = await getUserInfoFromTruffle(accessToken);
+		const isMod = roles.some((role) => role.name === 'mod');
+		const isAdmin = roles.some((role) => role.name === 'admin');
+		if (!isMod && !isAdmin) {
+			return new Response('Unauthorized (must be admin or mod)', { status: 401 });
+		}
 		const pair = new WebSocketPair();
 		const { 0: clientWebSocket, 1: serverWebSocket } = pair;
 		serverWebSocket.accept();
-		const serverWebSocketData = { webSocket: serverWebSocket, id: crypto.randomUUID() };
+		const serverWebSocketData = { webSocket: serverWebSocket, id: crypto.randomUUID(), name };
 		this.webSockets.add(serverWebSocketData);
 
 		this.sendCurrentState(serverWebSocket);
@@ -206,7 +228,7 @@ export class WheelEntries {
 					const newEntry: EntryProps = {
 						id: crypto.randomUUID(),
 						text: eventData.entry.text,
-						author: eventData.entry.author,
+						author: serverWebSocketData.name,
 						isSafe: eventData.entry.isSafe || false,
 						isOnWheel: eventData.entry.isOnWheel || false,
 						isWinner: eventData.entry.isWinner || false,

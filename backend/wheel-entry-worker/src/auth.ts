@@ -36,7 +36,7 @@ type Response = {
 export const getUserInfoFromTruffle = async (accessToken: string) => {
 	const query = `
 		query {
-			me { name }
+			me { name, id }
 			orgUser {
 				name
 				roleConnection {
@@ -88,7 +88,13 @@ type TokenData = {
 	packageMemberId: string;
 };
 
-export const validateAccessToken: (token: string) => Promise<TokenData> = async (token: string) => {
+/**
+ * Validates a JWT token and retrieves the payload data
+ * @param token The JWT token.
+ * @returns A promise that resolves to the token payload data.
+ * @throws An error if the token is invalid.
+ */
+export const getTruffleTokenPayload: (token: string) => Promise<TokenData> = async (token: string) => {
 	const isValid = await verify(token, MYCELIUM_PUBLIC_ES256_KEY, { algorithm: 'ES256' });
 
 	if (!isValid) {
