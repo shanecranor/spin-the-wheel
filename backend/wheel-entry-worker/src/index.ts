@@ -179,8 +179,8 @@ export class WheelEntries {
 		}
 		//if the request is a websocket upgrade request the client needs to be a mod or admin
 		const { name, roles } = await getUserInfoFromTruffle(accessToken);
-		const isMod = roles.some((role) => role.name === 'mod');
-		const isAdmin = roles.some((role) => role.name === 'admin');
+		const isMod = roles.includes('moderator');
+		const isAdmin = roles.includes('admin');
 		if (!isMod && !isAdmin) {
 			return new Response('Unauthorized (must be admin or mod)', { status: 401 });
 		}
