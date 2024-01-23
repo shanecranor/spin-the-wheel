@@ -9,48 +9,45 @@ type PayloadProps = {
 	packageMemberId: string;
 };
 
-const MYCELIUM_API_URL = 'https://mycelium.truffle.vip/graphql';
-const MYCELIUM_PUBLIC_ES256_KEY =
+const MOTHERTREE_API_URL = 'https://mothertree.staging.bio/graphql';
+const MOTHERTREE_PUBLIC_ES256_KEY =
 	'-----BEGIN PUBLIC KEY-----\n' +
 	'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEGzVELuVubW1DcXJPZ7cHssy4SXc0\n' +
 	'd6inNpg1L8Lwo/YqSnNQwW+nJTQOm9q+ZAfJUjOgHpfMpyNYVOzaWunz2Q==\n' +
 	'-----END PUBLIC KEY-----';
-type Response = {
+type OrgMemberResponse = {
 	data: {
-		me: {
-			name: string;
-		};
-		orgUser: {
-			name: string;
-			roleConnection: {
-				nodes: {
-					id: string;
-					name: string;
-					rank: number;
-				}[];
-			};
+		orgMember: {
+			id: string;
+			orgId: string;
+			userId: string;
+			name: string | null;
+			roles: Array<{
+				id: string;
+				slug: string;
+			}>;
 		};
 	};
 };
 
 export const getUserInfoFromTruffle = async (accessToken: string) => {
+	const { orgId } = await getTruffleTokenPayload(accessToken);
 	const query = `
-		query {
-			me { name, id }
-			orgUser {
-				name
-				roleConnection {
-					nodes {
-						id
-						name
-						rank
-					}
-				}
-			}
-		}
+  query OrgMember {
+    orgMember(input: { orgId: "${orgId}" }) {
+        id
+        orgId
+        userId
+        name
+        roles {
+            id
+            slug
+        }
+    }
+}
 	`;
 	//fetch user info from truffle server using the access token
-	const response = await fetch(MYCELIUM_API_URL, {
+	const response = await fetch(MOTHERTREE_API_URL, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -63,19 +60,24 @@ export const getUserInfoFromTruffle = async (accessToken: string) => {
 		throw new Error(`HTTP error! status: ${response.status}`);
 	}
 
-	const data = (await response.json()) as Response['data'];
+	const respJson = (await response.json()) as OrgMemberResponse;
 	// Check for errors in the response body
-	if (typeof data !== 'object' || data === null) {
+	if (typeof respJson !== 'object' || respJson === null) {
 		throw new Error('Invalid response from server');
 	}
 
-	if ('errors' in data && data.errors) {
-		throw new Error(JSON.stringify(data.errors));
+	if ('errors' in respJson && respJson.errors) {
+		throw new Error(JSON.stringify(respJson.errors));
 	}
+	const data = respJson.data;
+	if (!data || !data.orgMember) {
+		throw new Error('no data or orgmember found');
+	}
+	const user = data.orgMember;
+	const name = user.name || 'Anonymous';
+	const roles = user.roles.map((role) => role.slug);
 
-	const name = data.orgUser.name || data.me.name;
-	const roles = data.orgUser.roleConnection.nodes;
-	return { name, roles };
+	return { name, userId: user.id, roles };
 };
 
 type TokenData = {
@@ -95,7 +97,7 @@ type TokenData = {
  * @throws An error if the token is invalid.
  */
 export const getTruffleTokenPayload: (token: string) => Promise<TokenData> = async (token: string) => {
-	const isValid = await verify(token, MYCELIUM_PUBLIC_ES256_KEY, { algorithm: 'ES256' });
+	const isValid = await verify(token, MOTHERTREE_PUBLIC_ES256_KEY, { algorithm: 'ES256' });
 
 	if (!isValid) {
 		throw new Error('Invalid token');
