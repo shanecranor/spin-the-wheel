@@ -12,19 +12,15 @@ export interface Env {
 export default {
 	async fetch(request: Request, env: Env) {
 		//get and validate the auth token
-		const authToken = request.headers.get('Authorization');
-		if (!authToken) {
-			return new Response('Missing Authorization header', { status: 401 });
-		}
-		const accessToken = authToken.split(' ')[1];
+		const accessToken = extractAccessToken(request);
 		if (!accessToken) {
 			return new Response('Missing access token', { status: 401 });
 		}
-		//get orgId from the access tokend to use as the durable object room id
+		//get orgId from the access token to use as the durable object room id
 		const { orgId } = await getTruffleTokenPayload(accessToken);
 
 		let id = env.WHEEL_ENTRIES.idFromName(orgId);
-
+		console.log('orgid', orgId);
 		// Construct the stub for the Durable Object using the ID.
 		// A stub is a client Object used to send messages to the Durable Object.
 		let obj = env.WHEEL_ENTRIES.get(id);
@@ -121,14 +117,12 @@ export class WheelEntries {
 		let globalParams = {};
 		//get each global param from the storage build a globalParams object
 		for (const key of Object.values(GlobalParamSettingCommand)) {
-			console.log('checking key', key);
 			const commandKey = key as GlobalParamSettingCommand;
 			if (!(key in globalParamMap)) {
 				console.error(`Invalid global param command ${key}`);
 				continue;
 			}
 			globalParams = { ...globalParams, [globalParamMap[commandKey]]: await this.storage.get(globalParamMap[commandKey]) };
-			console.log('globalParams', globalParams);
 			//not an Entry so delete from the entries map
 			storageMap.delete(globalParamMap[commandKey]);
 		}
@@ -149,10 +143,6 @@ export class WheelEntries {
 
 	// Handle requests sent to the Durable Object
 	async fetch(request: Request) {
-		const authToken = request.headers.get('Authorization');
-		if (!authToken) {
-			return new Response('Missing Authorization header', { status: 401 });
-		}
 		const accessToken = extractAccessToken(request);
 		if (!accessToken) {
 			return new Response('Missing access token', { status: 401 });
@@ -163,12 +153,16 @@ export class WheelEntries {
 		if (request.headers.get('Upgrade') !== 'websocket') {
 			//accept a regular post request for viewers adding entries (don't need to open a websocket for them)
 			if (request.method === 'POST' && url.pathname === '/add') {
-				const { name } = await getUserInfoFromTruffle(accessToken);
 				const body: ViewerEntryBody = await request.json();
+				if (!body.text) {
+					return new Response('Missing entry text', { status: 400 });
+				}
+				const { name } = await getUserInfoFromTruffle(accessToken);
 				const newEntry: EntryProps = {
 					id: crypto.randomUUID(),
 					text: body.text,
 					author: name,
+					// authorId: userId, // could add this if we want to have user ids
 					isSafe: false,
 					isOnWheel: false,
 				};
@@ -286,7 +280,7 @@ export class WheelEntries {
 		return new Response(null, {
 			status: 101,
 			headers: {
-				'Sec-WebSocket-Protocol': request.headers.get('Sec-WebSocket-Protocol') || '',
+				'Sec-WebSocket-Protocol': 'access_token',
 			},
 			webSocket: clientWebSocket,
 		});
