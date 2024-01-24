@@ -5,6 +5,7 @@ import { WSMessage } from "@shared/websocket-types";
 import { Command, GlobalParamSettingCommand } from "../../../shared/types";
 import { notifications } from "@mantine/notifications";
 import { globalState$ } from "./global-state";
+import { accessToken$ } from "../truffle-sdk";
 export const webSocket$ = observable<WebSocket | null>(null);
 
 export function startWebSockets() {
@@ -17,8 +18,14 @@ export function startWebSockets() {
   //get name from window object url
   const url = new URL(window.location.href);
   const name = url.searchParams.get("name") || "default";
+  const accessToken = accessToken$.peek();
+  if (typeof accessToken !== "string") {
+    console.error("Error getting truffle access token");
+    return;
+  }
   const webSocket = new WebSocket(
-    `wss://wheel-entry-worker.shanecranor.workers.dev?name=${name}`
+    `wss://wheel-entry-worker.shanecranor.workers.dev?name=${name}`,
+    ["access_token", accessToken]
   );
   webSocket.onopen = () => {
     console.log("WebSocket connection established.");

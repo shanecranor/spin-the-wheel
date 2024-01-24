@@ -11,12 +11,15 @@ import {
   Tabs,
 } from "@mantine/core";
 import { startWebSockets } from "../../state/websocket-manager";
-import { webSocketCommands } from "../../state/websocket-commands";
+// import { webSocketCommands } from "../../state/websocket-commands";
 import { globalState$ } from "../../state/global-state";
+import { orgUser$, embed, accessToken$ } from "../../truffle-sdk";
+import { createViewerEntry } from "../../state/viewer-commands";
 const App = observer(() => {
   startWebSockets();
   const activeTab = useObservable("Rules");
   const text = useObservable("");
+  const hasAlerted = useObservable(false);
   if (
     !globalState$.isAcceptingEntries.get() ||
     !globalState$.isGameStarted.get()
@@ -28,6 +31,7 @@ const App = observer(() => {
     if (!globalState$.isGameStarted.get()) {
       list.push("start the game");
     }
+
     return (
       <main>
         <Flex
@@ -40,6 +44,18 @@ const App = observer(() => {
         </Flex>
       </main>
     );
+  } else {
+    // alert the user once on page load
+    if (!hasAlerted.get()) {
+      embed.showToast({
+        title: "Spin The Wheel",
+        body: "Entries are open for spin the wheel!",
+        onClick: () => {
+          embed.openWindow();
+        },
+      });
+      hasAlerted.set(true);
+    }
   }
   return (
     <main>
@@ -50,7 +66,7 @@ const App = observer(() => {
         </Tabs.List>
 
         <Tabs.Panel value="Rules">
-          <Stack p="md">
+          <Stack p="lg">
             <Title>Rules for wheel entries</Title>
             <Blockquote p="sm">
               {globalState$.rules.get() ||
@@ -74,26 +90,26 @@ const App = observer(() => {
         justify="center"
         style={{ height: "100vh" }}
       > */}
-          <Stack p="md">
+          <Stack p="lg">
             <Title>Submit an item to the wheel</Title>
             <TextInput
-              m="sm"
               size="md"
               label="Enter an item to add to the wheel"
               placeholder="end stream"
               value={text.get()}
               onChange={(e) => text.set(e.currentTarget.value)}
             />
+            <Text>
+              This entry will be attached to your Truffle username:{" "}
+              {orgUser$.name.get() || "anonymous"}
+            </Text>
             <Button
               m="xs"
               onClick={() => {
-                webSocketCommands.createEntry({
-                  id: crypto.randomUUID(),
-                  text: text.peek(),
-                  author: "anonymous",
-                  isSafe: false,
-                  isOnWheel: false,
-                });
+                const token = accessToken$.get();
+                if (typeof token === "string") {
+                  createViewerEntry(text.get(), token);
+                }
               }}
             >
               Add to wheel (100 sparks)

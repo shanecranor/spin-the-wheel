@@ -2,6 +2,7 @@ import { EntryProps, Command, isEntryProps, globalParamMap, GlobalParamSettingCo
 import { CreateMessage, DeleteMessage, SetterMessage, WSMessage } from '@shared/websocket-types';
 import { ViewerEntryBody } from './types';
 import { getTruffleTokenPayload, getUserInfoFromTruffle } from './auth';
+import { extractAccessToken } from './util';
 export interface Env {
 	WHEEL_ENTRIES: DurableObjectNamespace;
 }
@@ -152,7 +153,7 @@ export class WheelEntries {
 		if (!authToken) {
 			return new Response('Missing Authorization header', { status: 401 });
 		}
-		const accessToken = authToken.split(' ')[1];
+		const accessToken = extractAccessToken(request);
 		if (!accessToken) {
 			return new Response('Missing access token', { status: 401 });
 		}
@@ -282,6 +283,12 @@ export class WheelEntries {
 		});
 
 		// return the client websocket
-		return new Response(null, { status: 101, webSocket: clientWebSocket });
+		return new Response(null, {
+			status: 101,
+			headers: {
+				'Sec-WebSocket-Protocol': request.headers.get('Sec-WebSocket-Protocol') || '',
+			},
+			webSocket: clientWebSocket,
+		});
 	}
 }
