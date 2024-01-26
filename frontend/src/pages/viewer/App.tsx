@@ -10,7 +10,7 @@ import {
   Stack,
   Tabs,
 } from "@mantine/core";
-import { startWebSockets } from "../../state/websocket-manager";
+import { startWebSockets, webSocket$ } from "../../state/websocket-manager";
 // import { webSocketCommands } from "../../state/websocket-commands";
 import { globalState$ } from "../../state/global-state";
 import { orgUser$, embed, accessToken$ } from "../../truffle-sdk";
@@ -20,6 +20,14 @@ const App = observer(() => {
   const activeTab = useObservable("Rules");
   const text = useObservable("");
   const hasAlerted = useObservable(false);
+  const accessToken = accessToken$.get();
+  if (accessToken instanceof Promise) {
+    console.log(accessToken.catch());
+    return <FullPageInfoMessage message="waiting for access token/no token" />;
+  }
+  if (webSocket$.get()?.OPEN !== WebSocket.OPEN) {
+    return <FullPageInfoMessage message="not connected to websocket" />;
+  }
   if (
     !globalState$.isAcceptingEntries.get() ||
     !globalState$.isGameStarted.get()
@@ -32,18 +40,7 @@ const App = observer(() => {
       list.push("start the game");
     }
 
-    return (
-      <main>
-        <Flex
-          direction="column"
-          align="center"
-          justify="center"
-          style={{ height: "100vh" }}
-        >
-          <Title>Waiting for streamer to {list.join(" and ")} </Title>
-        </Flex>
-      </main>
-    );
+    return;
   } else {
     // alert the user once on page load
     if (!hasAlerted.get()) {
@@ -122,4 +119,19 @@ const App = observer(() => {
   );
 });
 
+const FullPageInfoMessage = ({ message }: { message: string }) => {
+  return (
+    <main>
+      <Flex
+        direction="column"
+        align="center"
+        justify="center"
+        style={{ height: "100vh" }}
+        p="xl"
+      >
+        <Title>{message}</Title>
+      </Flex>
+    </main>
+  );
+};
 export default App;

@@ -8,13 +8,11 @@ import "./index.css";
 import { theme } from "./src/theme";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ColorSchemeScript forceColorScheme="dark" />
     <MantineProvider theme={theme} forceColorScheme="dark">
-      <Notifications />
       <App />
     </MantineProvider>
   </React.StrictMode>
