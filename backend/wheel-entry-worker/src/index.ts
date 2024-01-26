@@ -2,11 +2,11 @@ import { EntryProps, Command, isEntryProps, globalParamMap, GlobalParamSettingCo
 import { CreateMessage, DeleteMessage, SetterMessage, WSMessage } from '@shared/websocket-types';
 import { ViewerEntryBody } from './types';
 import { getTruffleTokenPayload, getUserInfoFromTruffle } from './auth';
-import { extractAccessToken } from './util';
+import { extractAccessToken, corsHeaders } from './util';
 export interface Env {
 	WHEEL_ENTRIES: DurableObjectNamespace;
 }
-
+const headers = corsHeaders;
 // Worker code:
 
 export default {
@@ -14,7 +14,7 @@ export default {
 		//get and validate the auth token
 		const accessToken = extractAccessToken(request);
 		if (!accessToken) {
-			return new Response('Missing access token', { status: 401 });
+			return new Response('Missing access token', { headers, status: 401 });
 		}
 		//get orgId from the access token to use as the durable object room id
 		const { orgId } = await getTruffleTokenPayload(accessToken);
@@ -145,7 +145,7 @@ export class WheelEntries {
 	async fetch(request: Request) {
 		const accessToken = extractAccessToken(request);
 		if (!accessToken) {
-			return new Response('Missing access token', { status: 401 });
+			return new Response('Missing access token', { headers, status: 401 });
 		}
 
 		let url = new URL(request.url);
@@ -167,17 +167,17 @@ export class WheelEntries {
 					isOnWheel: false,
 				};
 				this.createEntry(newEntry);
-				return new Response('Sucessfully added to the wheel!', { status: 200 });
+				return new Response('Sucessfully added to the wheel!', { headers, status: 200 });
 			}
 
-			return new Response('Expected a websocket', { status: 400 });
+			return new Response('Expected a websocket', { headers, status: 400 });
 		}
 		//if the request is a websocket upgrade request the client needs to be a mod or admin
 		const { name, roles } = await getUserInfoFromTruffle(accessToken);
 		const isMod = roles.includes('moderator');
 		const isAdmin = roles.includes('admin');
 		if (!isMod && !isAdmin) {
-			return new Response('Unauthorized (must be admin or mod)', { status: 401 });
+			return new Response('Unauthorized (must be admin or mod)', { headers, status: 401 });
 		}
 		const pair = new WebSocketPair();
 		const { 0: clientWebSocket, 1: serverWebSocket } = pair;
@@ -280,6 +280,7 @@ export class WheelEntries {
 		return new Response(null, {
 			status: 101,
 			headers: {
+				...headers,
 				'Sec-WebSocket-Protocol': 'access_token',
 			},
 			webSocket: clientWebSocket,

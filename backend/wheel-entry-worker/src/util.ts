@@ -21,3 +21,7 @@ export function extractAccessToken(request: Request) {
 	const token = protocolList.length > 1 ? protocolList[1] : null;
 	return token || null;
 }
+
+export const corsHeaders = {
+	'Access-Control-Allow-Origin': '*',
+};
