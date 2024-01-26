@@ -20,9 +20,14 @@ import { localCommands } from "../../state/local-commands";
 import { EntryProps } from "@shared/types";
 import { webSocketCommands } from "../../state/websocket-commands";
 import { CommandFunctions } from "../../state/commands";
-import { startWebSockets } from "../../state/websocket-manager";
+import {
+  isWebSocketOpen$,
+  startWebSockets,
+} from "../../state/websocket-manager";
 import { globalState$ } from "../../state/global-state";
 import { IconSettings } from "@tabler/icons-react";
+import { accessToken$ } from "../../truffle-sdk";
+import { FullPageInfoMessage } from "../../components/full-page-info-message/full-page-info-message";
 // import { IconSettings } from "@tabler/icons-react";
 const App = observer(() => {
   const params = new URLSearchParams(window.location.search);
@@ -40,6 +45,22 @@ const App = observer(() => {
 
   const commands: CommandFunctions =
     mode === "offline" ? localCommands : webSocketCommands;
+
+  // don't show the interface until we have an access token or websocket
+  const accessToken = accessToken$.get();
+  if (accessToken instanceof Promise) {
+    return (
+      <FullPageInfoMessage message="waiting for admin access token"></FullPageInfoMessage>
+    );
+  }
+  if (isWebSocketOpen$.get() === false) {
+    return (
+      <FullPageInfoMessage message="admin panel disconnected from websocket">
+        <Button onClick={() => startWebSockets()}>try to reconnect</Button>
+      </FullPageInfoMessage>
+    );
+  }
+
   return (
     <AppShell
       // withBorder={false}

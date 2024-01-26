@@ -1,7 +1,6 @@
 import { observer, useObservable } from "@legendapp/state/react";
 import {
   Button,
-  Flex,
   TextInput,
   Title,
   Text,
@@ -10,23 +9,32 @@ import {
   Stack,
   Tabs,
 } from "@mantine/core";
-import { startWebSockets, webSocket$ } from "../../state/websocket-manager";
+import {
+  isWebSocketOpen$,
+  startWebSockets,
+} from "../../state/websocket-manager";
 // import { webSocketCommands } from "../../state/websocket-commands";
 import { globalState$ } from "../../state/global-state";
 import { orgUser$, embed, accessToken$ } from "../../truffle-sdk";
 import { createViewerEntry } from "../../state/viewer-commands";
+import { FullPageInfoMessage } from "../../components/full-page-info-message/full-page-info-message";
 const App = observer(() => {
   startWebSockets();
   const activeTab = useObservable("Rules");
   const text = useObservable("");
   const hasAlerted = useObservable(false);
   const accessToken = accessToken$.get();
+
   if (accessToken instanceof Promise) {
     console.log(accessToken.catch());
     return <FullPageInfoMessage message="waiting for access token/no token" />;
   }
-  if (webSocket$.get()?.OPEN !== WebSocket.OPEN) {
-    return <FullPageInfoMessage message="not connected to websocket" />;
+  if (isWebSocketOpen$.get() === false) {
+    return (
+      <FullPageInfoMessage message="not connected to websocket">
+        <Button onClick={() => startWebSockets()}>try to reconnect</Button>
+      </FullPageInfoMessage>
+    );
   }
   if (
     !globalState$.isAcceptingEntries.get() ||
@@ -117,19 +125,4 @@ const App = observer(() => {
   );
 });
 
-const FullPageInfoMessage = ({ message }: { message: string }) => {
-  return (
-    <main>
-      <Flex
-        direction="column"
-        align="center"
-        justify="center"
-        style={{ height: "100vh" }}
-        p="xl"
-      >
-        <Title>{message}</Title>
-      </Flex>
-    </main>
-  );
-};
 export default App;

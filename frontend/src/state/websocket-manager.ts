@@ -7,7 +7,7 @@ import { notifications } from "@mantine/notifications";
 import { globalState$ } from "./global-state";
 import { accessToken$ } from "../truffle-sdk";
 export const webSocket$ = observable<WebSocket | null>(null);
-
+export const isWebSocketOpen$ = observable<boolean>(false);
 export function startWebSockets() {
   if (webSocket$.peek() !== null) {
     if (webSocket$.peek()?.readyState === WebSocket.OPEN) {
@@ -31,6 +31,7 @@ export function startWebSockets() {
   );
   webSocket.onopen = () => {
     console.log("WebSocket connection established.");
+    isWebSocketOpen$.set(true);
   };
 
   webSocket.onerror = (event) => {
@@ -49,6 +50,7 @@ export function startWebSockets() {
 
   webSocket.onclose = (event) => {
     console.log("WebSocket connection closed:", event);
+    isWebSocketOpen$.set(false);
   };
   webSocket$.set(webSocket);
 }
