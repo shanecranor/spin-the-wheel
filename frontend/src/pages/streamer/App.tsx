@@ -1,6 +1,3 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
 import "./App.scss";
 import { EntryManager } from "../../components/entry-manager/entry-manager";
 import { WheelSpinner } from "../../components/wheel-spinner/wheel-spinner";
@@ -28,7 +25,11 @@ import { globalState$ } from "../../state/global-state";
 import { IconSettings } from "@tabler/icons-react";
 // import { IconSettings } from "@tabler/icons-react";
 const App = observer(() => {
-  // const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
+  const params = new URLSearchParams(window.location.search);
+  const mode = params.get("mode") || "websockets";
+  if (mode === "websockets") {
+    startWebSockets();
+  }
   const [isSidebarOpen, { toggle: toggleDesktop }] = useDisclosure();
   const [settingsOpened, { open: openSettings, close: closeSettings }] =
     useDisclosure(true);
@@ -36,11 +37,7 @@ const App = observer(() => {
     commands.setRules(globalState$.rules.get());
     closeSettings();
   };
-  const params = new URLSearchParams(window.location.search);
-  const mode = params.get("mode") || "websockets";
-  if (mode === "websockets") {
-    startWebSockets();
-  }
+
   const commands: CommandFunctions =
     mode === "offline" ? localCommands : webSocketCommands;
   return (

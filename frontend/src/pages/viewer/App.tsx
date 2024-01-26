@@ -40,7 +40,7 @@ const App = observer(() => {
           justify="center"
           style={{ height: "100vh" }}
         >
-          <Title>Waiting for streamer to {list.join("and")} </Title>
+          <Title>Waiting for streamer to {list.join(" and ")} </Title>
         </Flex>
       </main>
     );

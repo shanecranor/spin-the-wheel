@@ -23,8 +23,10 @@ export function startWebSockets() {
     console.error("Error getting truffle access token");
     return;
   }
+  //name isn't used for anything anymore, should rm eventually
   const webSocket = new WebSocket(
     `wss://wheel-entry-worker.shanecranor.workers.dev?name=${name}`,
+    //access_token is passed as the protocol header
     ["access_token", accessToken]
   );
   webSocket.onopen = () => {
