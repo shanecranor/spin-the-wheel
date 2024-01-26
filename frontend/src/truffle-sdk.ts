@@ -10,7 +10,7 @@ import { fromSpecObservable } from "./util.ts";
 import { observable } from "@legendapp/state";
 const staging = "https://mothertree.staging.bio/graphql";
 const prod = "https://mothertree.truffle.vip/graphql";
-export const mothertreeApiUrl = staging || prod;
+export const mothertreeApiUrl = prod || staging;
 
 initTruffleApp({
   url: mothertreeApiUrl,

@@ -25,13 +25,13 @@ export default {
     {
       slug: "wheel-moderator",
       url: "https://wheel-spin.pages.dev/moderator/",
-      contentPageType: "youtubeLive",
+      contentPageType: "quickActions",
       isLoginRequired: true,
     },
     {
       slug: "wheel-admin-streamer",
       url: "https://wheel-spin.pages.dev/admin/",
-      contentPageType: "youtubeLive",
+      contentPageType: "appManagement",
       isLoginRequired: true,
     },
   ],

@@ -8,8 +8,7 @@ type PayloadProps = {
 	packageId: string;
 	packageMemberId: string;
 };
-
-const MOTHERTREE_API_URL = 'https://mothertree.staging.bio/graphql';
+const MOTHERTREE_API_URL = 'https://mothertree.truffle.vip/graphql'; //'https://mothertree.staging.bio/graphql';
 const MOTHERTREE_PUBLIC_ES256_KEY =
 	'-----BEGIN PUBLIC KEY-----\n' +
 	'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEGzVELuVubW1DcXJPZ7cHssy4SXc0\n' +
