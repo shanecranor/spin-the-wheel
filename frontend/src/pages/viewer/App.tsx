@@ -56,6 +56,7 @@ const App = observer(() => {
   }
   return (
     <main>
+      <Text>{accessToken}</Text>
       <Tabs value={activeTab.get()} onChange={(e) => activeTab.set(e)}>
         <Tabs.List>
           <Tabs.Tab value="Rules">Rules</Tabs.Tab>
