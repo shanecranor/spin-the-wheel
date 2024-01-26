@@ -7,6 +7,7 @@ export default {
       url: "https://wheel-spin.pages.dev/",
       contentPageType: "youtube",
       isLoginRequired: true,
+      iconUrl: "https://wheel-spin.pages.dev/wheel.svg",
       windowProps: {
         title: "Spin the Wheel",
         tooltipDescription: "Submit wheel entries",
@@ -19,18 +20,19 @@ export default {
           minWidth: 500,
           minHeight: 500,
         },
-        //TODO: iconUrl
       },
     },
     {
       slug: "wheel-moderator",
       url: "https://wheel-spin.pages.dev/moderator/",
+      iconUrl: "https://wheel-spin.pages.dev/wheel.svg",
       contentPageType: "quickActions",
       isLoginRequired: true,
     },
     {
       slug: "wheel-admin-streamer",
       url: "https://wheel-spin.pages.dev/admin/",
+      iconUrl: "https://wheel-spin.pages.dev/wheel.svg",
       contentPageType: "appManagement",
       isLoginRequired: true,
     },
