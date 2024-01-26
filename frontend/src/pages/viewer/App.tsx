@@ -104,10 +104,7 @@ const App = observer(() => {
             <Button
               m="xs"
               onClick={() => {
-                const token = accessToken$.get();
-                if (typeof token === "string") {
-                  createViewerEntry(text.get(), token);
-                }
+                createViewerEntry(text.get());
               }}
             >
               Add to wheel (100 sparks)

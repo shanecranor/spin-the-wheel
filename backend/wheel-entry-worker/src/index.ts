@@ -11,6 +11,17 @@ const headers = corsHeaders;
 
 export default {
 	async fetch(request: Request, env: Env) {
+		//handles cors preflight requests
+		if (request.method === 'OPTIONS') {
+			return new Response(null, {
+				headers: {
+					'Access-Control-Allow-Origin': '*',
+					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+					'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+				},
+			});
+		}
+
 		//get and validate the auth token
 		const accessToken = extractAccessToken(request);
 		if (!accessToken) {
