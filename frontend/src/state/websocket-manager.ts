@@ -98,7 +98,7 @@ export function handleWebSocketEvent(data: WSMessage) {
       }
       notifications.show({
         title: data.command,
-        message: "Value updated to" + data.value ? "true" : "false",
+        message: "Value updated to " + data.value,
       });
       handleGlobalCommand(data.command, data.value);
       break;
