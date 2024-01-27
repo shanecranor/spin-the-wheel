@@ -48,7 +48,7 @@ const App = observer(() => {
 
   // don't show the interface until we have an access token or websocket
   const accessToken = accessToken$.get();
-  if (accessToken instanceof Promise) {
+  if (typeof accessToken !== "string") {
     return (
       <FullPageInfoMessage message="waiting for admin access token"></FullPageInfoMessage>
     );

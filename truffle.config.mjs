@@ -27,6 +27,10 @@ export default {
       url: "https://wheel-spin.pages.dev/moderator/",
       iconUrl: "https://wheel-spin.pages.dev/wheel.svg",
       contentPageType: "quickActions",
+      tileProps: {
+        bgColor: "#00FF00",
+        title: "Review Wheel Entries",
+      },
       isLoginRequired: true,
     },
     {

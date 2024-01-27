@@ -1,12 +1,9 @@
 import {
-  getUserClient,
-  getOrgClient,
-  getOrgUserClient,
   initTruffleApp,
   getEmbed,
   getAccessToken,
+  getMtClient,
 } from "@trufflehq/sdk";
-import { fromSpecObservable } from "./util.ts";
 import { observable } from "@legendapp/state";
 const staging = "https://mothertree.staging.bio/graphql";
 const prod = "https://mothertree.truffle.vip/graphql";
@@ -16,10 +13,8 @@ initTruffleApp({
   url: mothertreeApiUrl,
 });
 
+export const mtClient = getMtClient();
 export const embed = getEmbed();
-export const user$ = fromSpecObservable(getUserClient().observable);
-export const org$ = fromSpecObservable(getOrgClient().observable);
-export const orgUser$ = fromSpecObservable(getOrgUserClient().observable);
-export const accessToken$ = observable<Promise<string> | string>(
-  getAccessToken()
-);
+export const org$ = observable(mtClient.getOrg());
+export const orgMember$ = observable(mtClient.getOrgMember());
+export const accessToken$ = observable(getAccessToken());

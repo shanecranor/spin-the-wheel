@@ -15,28 +15,36 @@ import {
 } from "../../state/websocket-manager";
 // import { webSocketCommands } from "../../state/websocket-commands";
 import { globalState$ } from "../../state/global-state";
-import { orgUser$, embed, accessToken$ } from "../../truffle-sdk";
+import { embed, accessToken$ } from "../../truffle-sdk";
 import { createViewerEntry } from "../../state/viewer-commands";
 import { FullPageInfoMessage } from "../../components/full-page-info-message/full-page-info-message";
+// import { OrgMemberPayload, getMtClient } from "@trufflehq/sdk";
+// import { useEffect, useMemo, useState } from "react";
 const App = observer(() => {
-  startWebSockets();
+  // const mtClient = useMemo(() => getMtClient(), []);
+  // const [orgMember, setOrgMember] = useState<OrgMemberPayload>();
+  // useEffect(() => {
+  //   mtClient?.getOrgMember().then((orgMember) => setOrgMember(orgMember));
+  //   // mtClient?.getRoles().then((roles) => setRoles(roles));
+  // }, []);
   const activeTab = useObservable("Rules");
   const text = useObservable("");
+  let errorMessage = undefined;
   const hasAlerted = useObservable(false);
   const accessToken = accessToken$.get();
+  startWebSockets();
 
-  if (accessToken instanceof Promise) {
-    console.log(accessToken.catch());
-    return <FullPageInfoMessage message="waiting for access token/no token" />;
-  }
-  if (isWebSocketOpen$.get() === false) {
-    return (
+  if (accessToken.state?.isLoaded === false) {
+    errorMessage = (
+      <FullPageInfoMessage message="waiting for access token/no token" />
+    );
+  } else if (isWebSocketOpen$.get() === false) {
+    errorMessage = (
       <FullPageInfoMessage message="not connected to websocket">
         <Button onClick={() => startWebSockets()}>try to reconnect</Button>
       </FullPageInfoMessage>
     );
-  }
-  if (
+  } else if (
     !globalState$.isAcceptingEntries.get() ||
     !globalState$.isGameStarted.get()
   ) {
@@ -47,8 +55,11 @@ const App = observer(() => {
     if (!globalState$.isGameStarted.get()) {
       list.push("start the game");
     }
-
-    return;
+    errorMessage = (
+      <FullPageInfoMessage
+        message={`waiting for the streamer to ${list.join(" and ")}`}
+      />
+    );
   } else {
     // alert the user once on page load
     if (!hasAlerted.get()) {
@@ -64,63 +75,68 @@ const App = observer(() => {
   }
   return (
     <main>
-      <Text>{accessToken}</Text>
-      <Tabs value={activeTab.get()} onChange={(e) => activeTab.set(e)}>
-        <Tabs.List>
-          <Tabs.Tab value="Rules">Rules</Tabs.Tab>
-          <Tabs.Tab value="Submit">Submit</Tabs.Tab>
-        </Tabs.List>
+      {errorMessage || (
+        <Tabs value={activeTab.get()} onChange={(e) => activeTab.set(e)}>
+          <Tabs.List>
+            <Tabs.Tab value="Rules">Rules</Tabs.Tab>
+            <Tabs.Tab value="Submit">Submit</Tabs.Tab>
+          </Tabs.List>
 
-        <Tabs.Panel value="Rules">
-          <Stack p="lg">
-            <Title>Rules for wheel entries</Title>
-            <Blockquote p="sm">
-              {globalState$.rules.get() ||
-                "creator hasn't submitted any rules yet"}
-            </Blockquote>
-            <Text>
-              By submitting an entry to the wheel, you agree to the rules set by
-              the creator. Entries that violate the rules may be removed.
-            </Text>
-            <Group justify="flex-end" pt="md">
-              <Button m="md" onClick={() => activeTab.set("Submit")}>
-                lets do it
-              </Button>
-            </Group>
-          </Stack>
-        </Tabs.Panel>
-        <Tabs.Panel value="Submit">
-          {/* <Flex
+          <Tabs.Panel value="Rules">
+            <Stack p="lg">
+              <Title>Rules for wheel entries</Title>
+              <Blockquote p="sm">
+                {globalState$.rules.get() ||
+                  "creator hasn't submitted any rules yet"}
+              </Blockquote>
+              <Text>
+                By submitting an entry to the wheel, you agree to the rules set
+                by the creator. Entries that violate the rules may be removed.
+              </Text>
+              <Group justify="flex-end" pt="md">
+                <Button m="md" onClick={() => activeTab.set("Submit")}>
+                  lets do it
+                </Button>
+              </Group>
+            </Stack>
+          </Tabs.Panel>
+          <Tabs.Panel value="Submit">
+            {/* <Flex
         direction="column"
         align="center"
         justify="center"
         style={{ height: "100vh" }}
       > */}
-          <Stack p="lg">
-            <Title>Submit an item to the wheel</Title>
-            <TextInput
-              size="md"
-              label="Enter an item to add to the wheel"
-              placeholder="end stream"
-              value={text.get()}
-              onChange={(e) => text.set(e.currentTarget.value)}
-            />
-            <Text>
-              This entry will be attached to your Truffle username:{" "}
-              {orgUser$.name.get() || "anonymous"}
-            </Text>
-            <Button
-              m="xs"
-              onClick={() => {
-                createViewerEntry(text.get());
-              }}
-            >
-              Add to wheel (100 sparks)
-            </Button>
-          </Stack>
-          {/* </Flex> */}
-        </Tabs.Panel>
-      </Tabs>
+            <Stack p="lg">
+              <Title>Submit an item to the wheel</Title>
+              <TextInput
+                size="md"
+                label="Enter an item to add to the wheel"
+                placeholder="end stream"
+                value={text.get()}
+                onChange={(e) => text.set(e.currentTarget.value)}
+              />
+              {/* This is broken for some reason... will try to fix later */}
+              {/* <Text>
+                This entry will be attached to your Truffle username:{" "}
+                {orgMember ? orgMember.name : "Anonymous"}
+              </Text> */}
+              <Button
+                m="xs"
+                onClick={async () => {
+                  const isSuccess = await createViewerEntry(text.get());
+                  if (isSuccess) {
+                    text.set("");
+                    alert("Entry Submitted!");
+                  }
+                }}
+              >
+                Submit to wheel
+              </Button>
+            </Stack>
+          </Tabs.Panel>
+        </Tabs>
+      )}
     </main>
   );
 });
