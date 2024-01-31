@@ -185,15 +185,15 @@ export class WheelEntries {
 		}
 		//if the request is a websocket upgrade request the client needs to be a mod or admin
 		const { name, roles } = await getUserInfoFromTruffle(accessToken);
-		const isMod = roles.includes('moderator');
+		const isMod = roles.includes('moderator') || roles.includes('mod');
 		const isAdmin = roles.includes('admin');
-		if (!isMod && !isAdmin) {
-			return new Response('Unauthorized (must be admin or mod)', { headers, status: 401 });
-		}
+		// if (!isMod && !isAdmin) {
+		// 	return new Response('Unauthorized (must be admin or mod)', { headers, status: 401 });
+		// }
 		const pair = new WebSocketPair();
 		const { 0: clientWebSocket, 1: serverWebSocket } = pair;
 		serverWebSocket.accept();
-		const serverWebSocketData = { webSocket: serverWebSocket, id: crypto.randomUUID(), name };
+		const serverWebSocketData = { webSocket: serverWebSocket, id: crypto.randomUUID(), name, isMod, isAdmin };
 		this.webSockets.add(serverWebSocketData);
 
 		this.sendCurrentState(serverWebSocket);
@@ -220,7 +220,12 @@ export class WheelEntries {
 				console.error(eventData.error);
 				return;
 			}
-
+			//if the client is not a mod or admin then lets not let them do anything
+			//this means the client will only be able to recieve messages
+			if (!serverWebSocketData.isAdmin && !serverWebSocketData.isMod) {
+				sendServerError('Unauthorized (must be admin or mod)');
+				return;
+			}
 			switch (eventData.command) {
 				case 'Create':
 					if (!eventData.entry) {
