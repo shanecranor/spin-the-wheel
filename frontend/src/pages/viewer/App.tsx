@@ -17,7 +17,7 @@ import {
 import { globalState$ } from "../../state/global-state";
 import { embed, accessToken$ } from "../../truffle-sdk";
 import { createViewerEntry } from "../../state/viewer-commands";
-import { FullPageInfoMessage } from "../../components/full-page-info-message/full-page-info-message";
+import { getErrorMessage } from "../../components/error-page/error-page";
 // import { OrgMemberPayload, getMtClient } from "@trufflehq/sdk";
 // import { useEffect, useMemo, useState } from "react";
 const App = observer(() => {
@@ -29,50 +29,25 @@ const App = observer(() => {
   // }, []);
   const activeTab = useObservable("Rules");
   const text = useObservable("");
-  let errorMessage = undefined;
   const hasAlerted = useObservable(false);
-  const accessToken = accessToken$.get();
+  const errorMessage = getErrorMessage(
+    accessToken$.get(),
+    isWebSocketOpen$.get(),
+    globalState$.get()
+  );
   startWebSockets();
-
-  if (accessToken.state?.isLoaded === false) {
-    errorMessage = (
-      <FullPageInfoMessage message="waiting for access token/no token" />
-    );
-  } else if (isWebSocketOpen$.get() === false) {
-    errorMessage = (
-      <FullPageInfoMessage message="not connected to websocket">
-        <Button onClick={() => startWebSockets()}>try to reconnect</Button>
-      </FullPageInfoMessage>
-    );
-  } else if (
-    !globalState$.isAcceptingEntries.get() ||
-    !globalState$.isGameStarted.get()
-  ) {
-    const list = [];
-    if (!globalState$.isAcceptingEntries.get()) {
-      list.push("start accepting entries");
-    }
-    if (!globalState$.isGameStarted.get()) {
-      list.push("start the game");
-    }
-    errorMessage = (
-      <FullPageInfoMessage
-        message={`waiting for the streamer to ${list.join(" and ")}`}
-      />
-    );
-  } else {
-    // alert the user once on page load
-    if (!hasAlerted.get()) {
-      embed.showToast({
-        title: "Spin The Wheel",
-        body: "Entries are open for spin the wheel!",
-        onClick: () => {
-          embed.openWindow();
-        },
-      });
-      hasAlerted.set(true);
-    }
+  // alert the user once on page load
+  if (!errorMessage && !hasAlerted.get()) {
+    embed.showToast({
+      title: "Spin The Wheel",
+      body: "Entries are open for spin the wheel!",
+      onClick: () => {
+        embed.openWindow();
+      },
+    });
+    hasAlerted.set(true);
   }
+
   return (
     <main>
       {errorMessage || (
