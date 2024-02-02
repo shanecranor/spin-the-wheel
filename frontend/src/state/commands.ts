@@ -1,4 +1,4 @@
-import { EntryProps } from "@shared/types";
+import { CurrencyInfo, EntryProps } from "@shared/types";
 
 export type EntryFunction = (entry: EntryProps) => void;
 export type EntryIdFunction = (id: string) => void;
@@ -11,6 +11,7 @@ export interface CommandFunctions {
   setIsSafe: EntryIdBoolFunction;
   setIsWinner: EntryIdBoolFunction;
   setRules: (rules: string) => void;
+  setCurrencyInfo: (currencyInfo: CurrencyInfo[]) => void;
   setIsAcceptingEntries: (isAcceptingEntries: boolean) => void;
   setIsGameStarted: (isGameStarted: boolean) => void;
 }

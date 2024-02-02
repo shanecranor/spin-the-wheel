@@ -25,6 +25,7 @@ export const SettingsModal = observer(
   }) => {
     const closeSettingsAndSave = () => {
       commands.setRules(globalState$.rules.get());
+      commands.setCurrencyInfo(globalState$.currencyInfo.get());
       close();
     };
     return (

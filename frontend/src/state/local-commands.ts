@@ -1,4 +1,4 @@
-import { EntryProps } from "@shared/types";
+import { CurrencyInfo, EntryProps } from "@shared/types";
 // import { getRandomInt } from "../util";
 import { entryState$ } from "./entry-state";
 import { CommandFunctions } from "./commands";
@@ -7,6 +7,10 @@ import { globalState$ } from "./global-state";
 export const localCommands: CommandFunctions = {
   setRules(rules: string) {
     globalState$.set((oldState) => ({ ...oldState, rules }));
+  },
+
+  setCurrencyInfo(currencyInfo: CurrencyInfo[]) {
+    globalState$.set((oldState) => ({ ...oldState, currencyInfo }));
   },
 
   setIsAcceptingEntries(isAcceptingEntries: boolean) {

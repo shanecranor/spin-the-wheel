@@ -1,5 +1,6 @@
 import {
   Command,
+  CurrencyInfo,
   EntryProps,
   GlobalParamSettingCommand,
 } from "../../../shared/types";
@@ -25,6 +26,12 @@ export const webSocketCommands: CommandFunctions = {
     sendWebsocketMessage({
       command: GlobalParamSettingCommand.SetRules,
       value: rules,
+    });
+  },
+  setCurrencyInfo(currencyInfo: CurrencyInfo[]) {
+    sendWebsocketMessage({
+      command: GlobalParamSettingCommand.SetCurrencyInfo,
+      value: currencyInfo,
     });
   },
   setIsAcceptingEntries(isAcceptingEntries: boolean) {
