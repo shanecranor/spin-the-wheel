@@ -11,7 +11,8 @@ import {
 } from "@mantine/core";
 import { globalState$ } from "../../state/global-state";
 import { CommandFunctions } from "../../state/commands";
-
+import styles from "./settings-modal.module.scss";
+import { CurrencyCard } from "./currency-card/currency-card";
 export const SettingsModal = observer(
   ({
     opened,
@@ -28,9 +29,10 @@ export const SettingsModal = observer(
     };
     return (
       <Modal
+        className={styles["c-settings-modal"]}
         opened={opened}
         onClose={closeSettingsAndSave}
-        size="lg"
+        size="xl"
         withCloseButton={false}
         centered
       >
@@ -39,7 +41,7 @@ export const SettingsModal = observer(
           <Textarea
             size="md"
             label="Rules/Criteria"
-            description="What can viewers submit? (and what shouldn't they submit)"
+            description="Set viewer submission guidelines here. Viewers will see this before submitting their entries."
             placeholder="No rules yet"
             minRows={2}
             autosize
@@ -48,6 +50,11 @@ export const SettingsModal = observer(
               globalState$.rules.set(event.currentTarget.value);
             }}
           />
+          <Title order={2}>Submission Cost</Title>
+          {globalState$.currencyInfo.map((currency$) => (
+            <CurrencyCard currency$={currency$} />
+          ))}
+
           <Title order={2}>Game Status</Title>
           <div>
             <Group>
