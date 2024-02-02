@@ -1,4 +1,12 @@
-import { EntryProps, Command, isEntryProps, globalParamMap, GlobalParamSettingCommand } from '@shared/types';
+import {
+	EntryProps,
+	Command,
+	isEntryProps,
+	globalParamMap,
+	GlobalParamSettingCommand,
+	isCurrencyInfoArray,
+	CurrencyInfo,
+} from '@shared/types';
 import { CreateMessage, DeleteMessage, SetterMessage, WSMessage } from '@shared/websocket-types';
 import { ViewerEntryBody } from './types';
 import { getTruffleTokenPayload, getUserInfoFromTruffle } from './auth';
@@ -141,7 +149,7 @@ export class WheelEntries {
 		serverWebSocket.send(JSON.stringify({ command, entries, ...globalParams }));
 	}
 
-	async setGlobalParam(command: GlobalParamSettingCommand, value: boolean | string) {
+	async setGlobalParam(command: GlobalParamSettingCommand, value: boolean | string | CurrencyInfo[]) {
 		if (!(command in globalParamMap)) {
 			console.error(`Invalid global param command ${command}`);
 			return;
@@ -281,6 +289,12 @@ export class WheelEntries {
 					}
 					this.setGlobalParam(eventData.command, eventData.value);
 					break;
+				case 'setCurrencyInfo':
+					if (!isCurrencyInfoArray(eventData.value)) {
+						sendServerError('Invalid currency info');
+						return;
+					}
+					this.setGlobalParam(eventData.command, eventData.value);
 				default:
 					sendServerError('Invalid command');
 					return;
