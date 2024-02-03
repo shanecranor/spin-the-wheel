@@ -1,4 +1,9 @@
-import { Command, EntryProps, GlobalParamSettingCommand } from "@shared/types";
+import {
+  Command,
+  CurrencyInfo,
+  EntryProps,
+  GlobalParamSettingCommand,
+} from "@shared/types";
 
 export interface CreateMessage {
   command: Command.Create;
@@ -30,6 +35,7 @@ export interface GetDataMessage {
   command: Command.GetData;
   entries: EntryProps[];
   rules: string;
+  currencyInfo: CurrencyInfo[];
 }
 
 export type WSMessage =

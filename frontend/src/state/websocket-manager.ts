@@ -2,13 +2,18 @@ import { localCommands } from "./local-commands";
 import { entryState$, mapFromEntries } from "./entry-state";
 import { observable } from "@legendapp/state";
 import { WSMessage } from "@shared/websocket-types";
-import { Command, GlobalParamSettingCommand } from "../../../shared/types";
+import {
+  Command,
+  GlobalParamSettingCommand,
+  isCurrencyInfoArray,
+} from "../../../shared/types";
 import { notifications } from "@mantine/notifications";
 import { globalState$ } from "./global-state";
 import { accessToken$ } from "../truffle-sdk";
 export const webSocket$ = observable<WebSocket | null>(null);
 export const isWebSocketOpen$ = observable<boolean>(false);
 export function startWebSockets() {
+  console.log("trying to start websockets");
   if (webSocket$.peek() !== null) {
     if (webSocket$.peek()?.readyState === WebSocket.OPEN) {
       console.log("WebSocket connection already established.");
@@ -73,6 +78,7 @@ export function handleWebSocketEvent(data: WSMessage) {
         rules: data.rules,
         isGameStarted: data.isGameStarted,
         isAcceptingEntries: data.isAcceptingEntries,
+        currencyInfo: data.currencyInfo,
       }));
       break;
     case GlobalParamSettingCommand.SetRules:
@@ -101,6 +107,21 @@ export function handleWebSocketEvent(data: WSMessage) {
         message: "Value updated to " + data.value,
       });
       handleGlobalCommand(data.command, data.value);
+      break;
+    case GlobalParamSettingCommand.SetCurrencyInfo:
+      if (!data.value) {
+        console.error("No currency info provided");
+        return;
+      }
+      if (!isCurrencyInfoArray(data.value)) {
+        console.error("Invalid currency info provided");
+        return;
+      }
+      notifications.show({
+        title: "Currency info updated",
+        message: "Currency info has been updated",
+      });
+      localCommands.setCurrencyInfo(data.value);
       break;
     case Command.Create:
       if (!data.entry) {

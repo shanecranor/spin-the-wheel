@@ -1,5 +1,6 @@
 .c-settings-modal {
   .currency-settings {
+    --mantine-color-error: red;
     background: rgba(255, 255, 255, 0.06);
     &.selected {
       background: color-mix(
