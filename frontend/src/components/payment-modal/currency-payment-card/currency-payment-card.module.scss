@@ -1,0 +1,5 @@
+.caps {
+  &::first-letter {
+    text-transform: capitalize;
+  }
+}

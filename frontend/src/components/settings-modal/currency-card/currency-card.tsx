@@ -58,7 +58,11 @@ export const CurrencyCard = observer(
                   allowDecimal={false}
                   hideControls
                   onChange={(value) => {
-                    currency$.maxPrice.set(Number(value));
+                    if (value === "") {
+                      currency$.maxPrice.set(value);
+                    } else {
+                      currency$.maxPrice.set(Number(value));
+                    }
                   }}
                 />
               </Group>

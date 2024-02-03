@@ -1,4 +1,4 @@
-import { observer, useObservable } from "@legendapp/state/react";
+import { observer, useEffectOnce, useObservable } from "@legendapp/state/react";
 import {
   Button,
   TextInput,
@@ -13,11 +13,11 @@ import {
   isWebSocketOpen$,
   startWebSockets,
 } from "../../state/websocket-manager";
-// import { webSocketCommands } from "../../state/websocket-commands";
 import { globalState$ } from "../../state/global-state";
 import { embed, accessToken$ } from "../../truffle-sdk";
-import { createViewerEntry } from "../../state/viewer-commands";
+// import { createViewerEntry } from "../../state/viewer-commands";
 import { getErrorMessage } from "../../components/error-page/error-page";
+import { PaymentModal } from "../../components/payment-modal/payment-modal";
 // import { OrgMemberPayload, getMtClient } from "@trufflehq/sdk";
 // import { useEffect, useMemo, useState } from "react";
 const App = observer(() => {
@@ -27,15 +27,17 @@ const App = observer(() => {
   //   mtClient?.getOrgMember().then((orgMember) => setOrgMember(orgMember));
   //   // mtClient?.getRoles().then((roles) => setRoles(roles));
   // }, []);
-  const activeTab = useObservable("Rules");
-  const text = useObservable("");
+  const paymentModalOpened = useObservable(false);
+  const paymentModalClose = () => paymentModalOpened.set(false);
+  const activeTab = useObservable("Submit");
+  const text$ = useObservable("");
   const hasAlerted = useObservable(false);
   const errorMessage = getErrorMessage(
     accessToken$.get(),
     isWebSocketOpen$.get(),
     globalState$.get()
   );
-  startWebSockets();
+  useEffectOnce(() => startWebSockets());
   // alert the user once on page load
   if (!errorMessage && !hasAlerted.get()) {
     embed.showToast({
@@ -50,6 +52,11 @@ const App = observer(() => {
 
   return (
     <main>
+      <PaymentModal
+        opened={paymentModalOpened.get()}
+        close={paymentModalClose}
+        text$={text$}
+      />
       {errorMessage || (
         <Tabs value={activeTab.get()} onChange={(e) => activeTab.set(e)}>
           <Tabs.List>
@@ -88,22 +95,24 @@ const App = observer(() => {
                 size="md"
                 label="Enter an item to add to the wheel"
                 placeholder="end stream"
-                value={text.get()}
-                onChange={(e) => text.set(e.currentTarget.value)}
+                value={text$.get()}
+                onChange={(e) => text$.set(e.currentTarget.value)}
               />
               {/* This is broken for some reason... will try to fix later */}
               {/* <Text>
                 This entry will be attached to your Truffle username:{" "}
                 {orgMember ? orgMember.name : "Anonymous"}
               </Text> */}
+
               <Button
                 m="xs"
                 onClick={async () => {
-                  const isSuccess = await createViewerEntry(text.get());
-                  if (isSuccess) {
-                    text.set("");
-                    alert("Entry Submitted!");
-                  }
+                  paymentModalOpened.set(true);
+                  // const isSuccess = await createViewerEntry(text$.get());
+                  // if (isSuccess) {
+                  //   text$.set("");
+                  //   alert("Entry Submitted!");
+                  // }
                 }}
               >
                 Submit to wheel
