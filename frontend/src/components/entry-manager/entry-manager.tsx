@@ -88,36 +88,6 @@ export const EntryManager = ({ stateFunctions }: EntryManagerProps) => {
                 </SimpleGrid>
               </Accordion.Panel>
             </Accordion.Item>
-            <Accordion.Item value="dangerous">
-              <Accordion.Control>
-                Unreviewed ({unsafe.length})
-              </Accordion.Control>
-              <Accordion.Panel>
-                <Text mb="lg" mt="8px">
-                  <a
-                    href="/moderator/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    target-new="window"
-                  >
-                    Open unreviewed entries in a new window (hidden from stream)
-                  </a>
-                </Text>
-                {unsafe.length === 0 ? (
-                  <Text size="lg">no new unreviewed submissions </Text>
-                ) : (
-                  <Spoiler
-                    maxHeight={0}
-                    showLabel="Show unreviewed submissions (be careful if you are streaming)"
-                    hideLabel="Hide unreviewed submissions"
-                  >
-                    <SimpleGrid cols={1} spacing="sm">
-                      {unsafe}
-                    </SimpleGrid>
-                  </Spoiler>
-                )}
-              </Accordion.Panel>
-            </Accordion.Item>
           </Accordion>
         </Tabs.Panel>
 
