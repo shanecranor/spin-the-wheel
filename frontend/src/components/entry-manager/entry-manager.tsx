@@ -2,7 +2,6 @@ import {
   Accordion,
   Paper,
   SimpleGrid,
-  Spoiler,
   Tabs,
   Text,
 } from "@mantine/core";

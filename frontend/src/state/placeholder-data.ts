@@ -1,4 +1,3 @@
-import { fa } from "@faker-js/faker";
 import { EntryProps } from "@shared/types";
 
 export const tempEntryData: EntryProps[] = [

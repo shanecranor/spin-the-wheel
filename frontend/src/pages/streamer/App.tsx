@@ -3,7 +3,7 @@ import { EntryManager } from "../../components/entry-manager/entry-manager";
 import { WheelSpinner } from "../../components/wheel-spinner/wheel-spinner";
 import { getEntries } from "../../state/entry-state";
 import { observer } from "@legendapp/state/react";
-import { AppShell, Button, ActionIcon } from "@mantine/core";
+import { AppShell, Button } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { localCommands } from "../../state/local-commands";
 import { EntryProps } from "@shared/types";
