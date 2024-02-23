@@ -42,7 +42,7 @@ export const Wheel = observer(
                 Math.min(
                   45,
                   j * (j / (slice.text.length + j)) + smallestFontSize
-                ) + "px";
+                ) * Math.min(window.innerWidth / 1920 * 3, 1) + "px"; //little bit hacky, only updates on remount
               return (
                 <SliceText key={slice.id} rotation={rotation}>
                   <Tooltip label={slice.text} color="dark">
