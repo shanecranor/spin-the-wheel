@@ -7,6 +7,7 @@ export const WHEEL_COLORS = [
   "#EB55AA",
   "#F2982C",
   "#FADD81",
+  "#EB55AA",
 ];
 export function buildWheelOffsets(sliceData: EntryProps[]) {
   const totalSliceWeight = sliceData.reduce(
@@ -17,7 +18,7 @@ export function buildWheelOffsets(sliceData: EntryProps[]) {
     (slice) => (slice.weight || 1) / totalSliceWeight
   );
   const gradient = sliceWeights.map((weight, idx) => {
-    const color = WHEEL_COLORS[idx % 6];
+    const color = WHEEL_COLORS[idx % WHEEL_COLORS.length];
     const start = sliceWeights
       .slice(0, idx)
       .reduce((acc, weight) => acc + weight, 0);
