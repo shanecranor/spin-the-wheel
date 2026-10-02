@@ -1,6 +1,7 @@
 // import { faker } from '@faker-js/faker'
 import { EntryProps } from "@shared/types";
 import { SliceText } from "./slice/slice-text";
+import { SPIN_DURATION } from "./wheel-spin";
 import { buildWheelOffsets, buildWheelSVG } from "./wheel-svg-generator";
 import styles from "./wheel.module.scss";
 import { observer } from "@legendapp/state/react";
@@ -18,7 +19,7 @@ export const Wheel = observer(
     rotation,
     emptyState,
     compact = false,
-    spinDuration = 10000,
+    spinDuration = SPIN_DURATION,
   }: WheelProps) => {
     const wheelOffsets = buildWheelOffsets(wheelEntries);
     const svgMarkup = buildWheelSVG(wheelEntries);
@@ -37,7 +38,10 @@ export const Wheel = observer(
           style={{
             background: backgroundImage,
             transform: `rotate(${rotation * -1}deg)`,
-            transition: `transform ${spinDuration}ms cubic-bezier(.08,.49,0,1)`,
+            transition:
+              spinDuration === 0
+                ? "none"
+                : `transform ${spinDuration}ms cubic-bezier(.08,.49,0,1)`,
           }}
         >
           <div className={styles["slices-container"]}>

@@ -1,4 +1,4 @@
-import { EntryProps } from "@shared/types";
+import type { EntryProps } from "@shared/types";
 
 export const WHEEL_COLORS = [
   "#746EE0",

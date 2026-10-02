@@ -25,5 +25,5 @@ The state and selection tests use the built-in Node test runner and TypeScript
 support (Node 22.18 or newer):
 
 ```sh
-node --test tests/song-state.test.ts
+node --test tests/*.test.ts
 ```

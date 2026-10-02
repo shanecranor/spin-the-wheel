@@ -1,144 +1,39 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Checkbox,
-  Group,
-  Modal,
-  NumberInput,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
-import { Wheel } from "../../components/wheel/wheel";
-import {
-  applySettings,
-  choicesFor,
-  defaultSettings,
-  entriesFor,
-  INSTRUMENTS,
-  NOTES,
-  restoreState,
-  SCALES,
-  serializeState,
-  settingsError,
-  songPrompt,
-  SPIN_DURATION,
-  spinResult,
-  STORAGE_KEY,
-  TITLES,
-  WHEEL_IDS,
-} from "./song-state";
-import type { Settings, SongState, WheelId, WheelState } from "./song-state";
+import { useEffect, useState } from "react";
+import { observer } from "@legendapp/state/react";
+import { useReducedMotion } from "@mantine/hooks";
+import { Button, Group, Text, Title } from "@mantine/core";
+import { WheelCard } from "../../components/wheel-spinner/wheel-card";
+import { entriesFor } from "../../components/wheel/wheel-entries";
+import { choicesFor, songPrompt, TITLES, WHEEL_IDS } from "./song-state";
+import { SongSettingsModal } from "./song-settings-modal";
+import { songStore as store } from "./song-store";
 import styles from "./songwriting.module.scss";
 
-function loadState(): SongState {
-  try {
-    return restoreState(localStorage.getItem(STORAGE_KEY));
-  } catch {
-    return restoreState(null);
-  }
-}
-
-export default function App() {
-  const [state, setState] = useState(loadState);
-  const stateRef = useRef(state);
-  const timers = useRef<
-    Partial<Record<WheelId, ReturnType<typeof setTimeout>>>
-  >({});
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [draft, setDraft] = useState<Settings>(state.settings);
-  const [draftError, setDraftError] = useState<string | null>(null);
-  const [copyStatus, setCopyStatus] = useState("");
-  const [storageError, setStorageError] = useState(false);
-  const reducedMotion = useRef(
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-  );
-  const spinning = WHEEL_IDS.some((id) => state.wheels[id].spinning);
-  const prompt = songPrompt(state.wheels);
-  const canSpinAll = WHEEL_IDS.some(
-    (id) => !state.wheels[id].locked && !state.wheels[id].spinning,
-  );
-
-  function update(next: SongState) {
-    stateRef.current = next;
-    setState(next);
-    setCopyStatus("");
-  }
-
-  function updateWheel(id: WheelId, changes: Partial<WheelState>) {
-    const current = stateRef.current;
-    update({
-      ...current,
-      wheels: {
-        ...current.wheels,
-        [id]: { ...current.wheels[id], ...changes },
-      },
-    });
-  }
+const App = observer(() => {
+  const reducedMotion =
+    useReducedMotion(undefined, { getInitialValueInEffect: false }) ?? false;
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, serializeState(state));
-      setStorageError(false);
-    } catch {
-      setStorageError(true);
-    }
-  }, [state]);
+    store.setReducedMotion(reducedMotion);
+  }, [reducedMotion]);
 
-  useEffect(
-    () => () => {
-      Object.values(timers.current).forEach(clearTimeout);
-    },
-    [],
+  useEffect(() => () => store.dispose(), []);
+  const settings = store.state$.settings.get();
+  const wheels = store.state$.wheels.get();
+  const storageError = store.storageError$.get();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("");
+  const spinning = WHEEL_IDS.some((id) => wheels[id].isRotating);
+  const canSpinAll = WHEEL_IDS.some(
+    (id) => !wheels[id].locked && !wheels[id].isRotating,
   );
+  const prompt = spinning ? null : songPrompt(wheels);
+  let summary = prompt ?? "Spin the wheels to get your song constraints.";
+  if (spinning) summary = "Spinning…";
 
-  function spin(ids: readonly WheelId[]) {
-    const current = stateRef.current;
-    const next = { ...current, wheels: { ...current.wheels } };
-    const duration = reducedMotion.current ? 0 : SPIN_DURATION;
-    for (const id of ids) {
-      const wheel = current.wheels[id];
-      if (wheel.locked || wheel.spinning) continue;
-      const chosen = spinResult(
-        choicesFor(id, current.settings),
-        wheel.rotation,
-      );
-      next.wheels[id] = {
-        ...wheel,
-        rotation: chosen.rotation,
-        spinning: duration > 0,
-        result: duration ? wheel.result : chosen.result,
-      };
-      if (duration) {
-        timers.current[id] = setTimeout(() => {
-          updateWheel(id, {
-            spinning: false,
-            result: chosen.result,
-          });
-          delete timers.current[id];
-        }, duration);
-      }
-    }
-    update(next);
-  }
-
-  function toggleLock(id: WheelId) {
-    updateWheel(id, { locked: !stateRef.current.wheels[id].locked });
-  }
-
-  function toggleChoice(
-    key: "scales" | "notes" | "instruments",
-    value: string,
-    allowed: string[],
-  ) {
-    setDraft((old) => ({
-      ...old,
-      [key]: allowed.filter((item) =>
-        item === value ? !old[key].includes(item) : old[key].includes(item),
-      ),
-    }));
-    setDraftError(null);
-  }
+  useEffect(() => {
+    setCopyStatus("");
+  }, [prompt]);
 
   async function copyPrompt() {
     if (!prompt) return;
@@ -160,89 +55,38 @@ export default function App() {
           <Button
             variant="default"
             disabled={spinning}
-            onClick={() => {
-              setDraft(state.settings);
-              setDraftError(null);
-              setSettingsOpen(true);
-            }}
+            onClick={() => setSettingsOpen(true)}
           >
             Settings
           </Button>
           <Button
-            onClick={() => spin(WHEEL_IDS)}
+            onClick={() => store.spin(WHEEL_IDS)}
             disabled={spinning || !canSpinAll}
           >
             Spin all
           </Button>
         </Group>
       </header>
-
       <div className={styles.grid}>
-        {WHEEL_IDS.map((id) => {
-          const wheel = state.wheels[id];
-          const choices = choicesFor(id, state.settings);
-          return (
-            <section
-              key={id}
-              className={styles.panel}
-              aria-labelledby={`${id}-title`}
-              aria-busy={wheel.spinning}
-            >
-              <Title id={`${id}-title`} order={2} size="h4">
-                {TITLES[id]}
-              </Title>
-              <div className={styles.wheel}>
-                <div className={styles.disc}>
-                  <Wheel
-                    wheelEntries={entriesFor(choices)}
-                    rotation={wheel.rotation}
-                    compact
-                    spinDuration={wheel.spinning ? SPIN_DURATION : 0}
-                  />
-                </div>
-                <span className={styles.pointer} aria-hidden="true" />
-              </div>
-              <Text
-                className={styles.result}
-                aria-live="polite"
-                aria-atomic="true"
-              >
-                {wheel.spinning
-                  ? "Spinning…"
-                  : wheel.result
-                    ? `${wheel.result}${id === "tempo" ? " BPM" : ""}`
-                    : "—"}
-              </Text>
-              <Group justify="center" gap="sm">
-                <Button
-                  variant="light"
-                  disabled={wheel.locked || wheel.spinning}
-                  onClick={() => spin([id])}
-                  aria-label={`Spin ${TITLES[id].toLowerCase()}`}
-                >
-                  Spin
-                </Button>
-                <Button
-                  variant={wheel.locked ? "filled" : "default"}
-                  disabled={!wheel.result || wheel.spinning}
-                  aria-pressed={wheel.locked}
-                  aria-label={`${wheel.locked ? "Unlock" : "Lock"} ${TITLES[id].toLowerCase()}`}
-                  onClick={() => toggleLock(id)}
-                >
-                  {wheel.locked ? "Locked" : "Lock"}
-                </Button>
-              </Group>
-            </section>
-          );
-        })}
+        {WHEEL_IDS.map((id) => (
+          <WheelCard
+            key={id}
+            id={id}
+            title={TITLES[id]}
+            state$={store.state$.wheels[id]}
+            entries={entriesFor(choicesFor(id, settings))}
+            resultSuffix={id === "tempo" ? " BPM" : ""}
+            onSpin={() => store.spin([id])}
+            onToggleLock={() => store.toggleLock(id)}
+          />
+        ))}
       </div>
-
       <div className={styles.summary}>
         <Text size="xl" fw={500} aria-live="polite" aria-atomic="true">
-          {prompt || "Spin the wheels to get your song constraints."}
+          {summary}
         </Text>
         {prompt && (
-          <Button variant="default" disabled={spinning} onClick={copyPrompt}>
+          <Button variant="default" onClick={copyPrompt}>
             Copy result
           </Button>
         )}
@@ -253,110 +97,15 @@ export default function App() {
             ? "Browser storage is unavailable. Settings won’t survive a reload."
             : "")}
       </Text>
-
-      <Modal
-        opened={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        title="Settings"
-        centered
-        size="md"
-      >
-        <Stack gap="lg">
-          {(
-            [
-              ["scales", "Scales", SCALES],
-              ["notes", "Root notes", NOTES],
-              ["instruments", "Instruments", INSTRUMENTS],
-            ] as const
-          ).map(([key, title, allowed]) => (
-            <fieldset className={styles.choices} key={key}>
-              <legend>{title}</legend>
-              <div className={key === "notes" ? styles.notes : styles.options}>
-                {allowed.map((value) => (
-                  <Checkbox
-                    key={value}
-                    label={value}
-                    checked={draft[key].includes(value)}
-                    onChange={() => toggleChoice(key, value, [...allowed])}
-                  />
-                ))}
-              </div>
-            </fieldset>
-          ))}
-          <fieldset className={styles.choices}>
-            <legend>Tempo</legend>
-            <Group grow align="flex-start">
-              <NumberInput
-                label="Minimum BPM"
-                min={40}
-                max={240}
-                step={5}
-                allowDecimal={false}
-                value={Number.isFinite(draft.minTempo) ? draft.minTempo : ""}
-                onChange={(value) => {
-                  setDraft({
-                    ...draft,
-                    minTempo: value === "" ? NaN : Number(value),
-                  });
-                  setDraftError(null);
-                }}
-              />
-              <NumberInput
-                label="Maximum BPM"
-                min={40}
-                max={240}
-                step={5}
-                allowDecimal={false}
-                value={Number.isFinite(draft.maxTempo) ? draft.maxTempo : ""}
-                onChange={(value) => {
-                  setDraft({
-                    ...draft,
-                    maxTempo: value === "" ? NaN : Number(value),
-                  });
-                  setDraftError(null);
-                }}
-              />
-            </Group>
-            <Text size="sm" c="dimmed" mt="xs">
-              40-240 BPM, in steps of 5.
-            </Text>
-          </fieldset>
-          {draftError && (
-            <Text c="red" size="sm" role="alert">
-              {draftError}
-            </Text>
-          )}
-          <Group justify="space-between">
-            <Button
-              variant="subtle"
-              onClick={() => {
-                setDraft(defaultSettings());
-                setDraftError(null);
-              }}
-            >
-              Reset defaults
-            </Button>
-            <Group gap="sm">
-              <Button variant="default" onClick={() => setSettingsOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  const error = settingsError(draft);
-                  if (error) {
-                    setDraftError(error);
-                    return;
-                  }
-                  update(applySettings(stateRef.current, draft));
-                  setSettingsOpen(false);
-                }}
-              >
-                Apply
-              </Button>
-            </Group>
-          </Group>
-        </Stack>
-      </Modal>
+      {settingsOpen && (
+        <SongSettingsModal
+          settings={settings}
+          onApply={store.saveSettings}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
     </main>
   );
-}
+});
+
+export default App;

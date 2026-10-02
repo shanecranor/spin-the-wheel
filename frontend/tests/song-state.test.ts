@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { entriesFor } from "../src/components/wheel/wheel-entries.ts";
 import {
   applySettings,
   choicesFor,
@@ -9,29 +10,18 @@ import {
   serializeState,
   settingsError,
   songPrompt,
-  spinResult,
-  WHEEL_IDS,
 } from "../src/pages/songwriting/song-state.ts";
 
-test("every chosen slice lands at the pointer, including after repeated spins", () => {
-  const settings = defaultSettings();
-  for (const id of WHEEL_IDS) {
-    const choices = choicesFor(id, settings);
-    let rotation = 197.4;
-    choices.forEach((choice, index) => {
-      const chosen = spinResult(
-        choices,
-        rotation,
-        () => (index + 0.5) / choices.length,
-      );
-      assert.equal(chosen.result, choice);
-      assert.ok(chosen.rotation > rotation + 4 * 360);
-      const center = ((index + 0.5) / choices.length) * 360;
-      assert.ok(Math.abs((chosen.rotation % 360) - center) < 1e-9);
-      rotation = chosen.rotation;
-    });
-  }
-});
+function stateWithNote() {
+  const state = { settings: defaultSettings(), wheels: initialWheels() };
+  state.wheels.note = {
+    winningEntry: entriesFor(["C"])[0],
+    locked: true,
+    rotation: -1434,
+    isRotating: false,
+  };
+  return state;
+}
 
 test("tempo choices include both limits and support a single tempo", () => {
   assert.deepEqual(
@@ -44,22 +34,45 @@ test("tempo choices include both limits and support a single tempo", () => {
   );
 });
 
-test("saved selections and locks restore without restoring an active spin", () => {
-  const state = { settings: defaultSettings(), wheels: initialWheels() };
-  state.wheels.note = {
-    result: "C",
-    locked: true,
-    rotation: 2000,
-    spinning: true,
-  };
+test("saved selections, locks, and exact landing positions survive reload", () => {
+  const state = stateWithNote();
   const restored = restoreState(serializeState(state));
-  assert.equal(restored.wheels.note.result, "C");
-  assert.equal(restored.wheels.note.locked, true);
-  assert.equal(restored.wheels.note.spinning, false);
-  assert.equal(restored.wheels.note.rotation, 15);
+  assert.deepEqual(restored.wheels.note, state.wheels.note);
 });
 
-test("bad or outdated saved data falls back safely", () => {
+test("legacy saved results migrate without requiring a saved rotation", () => {
+  const restored = restoreState(
+    JSON.stringify({
+      version: 1,
+      settings: defaultSettings(),
+      wheels: { note: { result: "C", locked: true } },
+    }),
+  );
+  assert.equal(restored.wheels.note.winningEntry?.text, "C");
+  assert.equal(restored.wheels.note.locked, true);
+  assert.equal(restored.wheels.note.rotation, 15);
+  assert.equal(restored.wheels.note.isRotating, false);
+});
+
+test("applying unchanged settings preserves exact wheel positions and locks", () => {
+  const state = stateWithNote();
+  assert.deepEqual(
+    applySettings(state, defaultSettings()).wheels,
+    state.wheels,
+  );
+});
+
+test("changing another wheel's choices leaves the retained position untouched", () => {
+  const state = stateWithNote();
+  const changed = applySettings(state, {
+    ...state.settings,
+    minTempo: 100,
+    maxTempo: 120,
+  });
+  assert.deepEqual(changed.wheels.note, state.wheels.note);
+});
+
+test("bad saved data falls back safely, and missing winners are cleared", () => {
   for (const raw of [
     "garbage",
     "null",
@@ -71,26 +84,23 @@ test("bad or outdated saved data falls back safely", () => {
       wheels: initialWheels(),
     });
   }
-  const state = { settings: defaultSettings(), wheels: initialWheels() };
-  state.wheels.note.result = "invalid";
-  assert.equal(restoreState(serializeState(state)).wheels.note.result, null);
+  const saved = JSON.parse(serializeState(stateWithNote()));
+  saved.wheels.note.result = "invalid";
+  assert.deepEqual(
+    restoreState(JSON.stringify(saved)).wheels.note,
+    initialWheels().note,
+  );
 });
 
-test("changing choices clears excluded winners and locks", () => {
-  const state = { settings: defaultSettings(), wheels: initialWheels() };
-  state.wheels.note = {
-    result: "C",
-    locked: true,
-    rotation: 15,
-    spinning: false,
-  };
+test("changing the entries clears excluded winners or positions retained winners in the new layout", () => {
+  const state = stateWithNote();
   assert.deepEqual(
     applySettings(state, { ...state.settings, notes: ["D"] }).wheels.note,
     initialWheels().note,
   );
   const retained = applySettings(state, { ...state.settings, notes: ["C"] })
     .wheels.note;
-  assert.equal(retained.result, "C");
+  assert.equal(retained.winningEntry?.text, "C");
   assert.equal(retained.locked, true);
   assert.equal(retained.rotation, 180);
 });
@@ -103,17 +113,16 @@ test("settings reject empty choices, invalid intervals, and reversed ranges", ()
     { minTempo: 200, maxTempo: 100 },
     { minTempo: NaN },
     { maxTempo: 300 },
-  ]) {
+  ])
     assert.ok(settingsError({ ...defaultSettings(), ...changes }));
-  }
 });
 
 test("song prompt combines the root note with its scale", () => {
   const wheels = initialWheels();
   assert.equal(songPrompt(wheels), null);
-  wheels.note.result = "C";
-  wheels.scale.result = "major";
-  wheels.instrument.result = "Guitar";
-  wheels.tempo.result = "105";
+  wheels.note.winningEntry = entriesFor(["C"])[0];
+  wheels.scale.winningEntry = entriesFor(["major"])[0];
+  wheels.instrument.winningEntry = entriesFor(["Guitar"])[0];
+  wheels.tempo.winningEntry = entriesFor(["105"])[0];
   assert.equal(songPrompt(wheels), "C major · Guitar · 105 BPM");
 });

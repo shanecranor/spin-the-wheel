@@ -1,7 +1,8 @@
 import { Wheel } from "../wheel/wheel";
 import { observer } from "@legendapp/state/react";
 import { wheelState$ } from "./wheel-state";
-import { WHEEL_COLORS, buildWheelOffsets } from "../wheel/wheel-svg-generator";
+import { WHEEL_COLORS } from "../wheel/wheel-svg-generator";
+import { calculateWheelSpin, SPIN_COMPLETION_DELAY } from "../wheel/wheel-spin";
 import styles from "./wheel-spinner.module.scss";
 import { useDisclosure } from "@mantine/hooks";
 import { Button, Group, Modal, Stack, Text, Title } from "@mantine/core";
@@ -92,31 +93,19 @@ function doSpin(
   open: () => void,
   setIsWinner: EntryIdBoolFunction
 ) {
-  //fetch slice data
-
-  const sliceData = wheelEntries;
-  //choose a random slice to win
-  const winnerIdx = Math.floor(Math.random() * sliceData.length);
-  const winningEntry = sliceData[winnerIdx];
-  //set the winner entry
-  wheelState$.winningEntry.set(winningEntry);
-  //build the wheel offsets so we can choose a random angle
-  const wheelOffsets = buildWheelOffsets(sliceData);
-  const idx = sliceData.findIndex((slice) => slice.id === winningEntry.id);
-  //set the rotation to the random angle
-  const newAngle =
-    getRandomFloat(wheelOffsets[idx].start, wheelOffsets[idx].end) * 360;
-  const spins = Math.ceil(Math.random() * 2 + 4);
-  wheelState$.rotation.set(
-    (old) => old + (360 - (old % 360)) + newAngle + spins * -360
+  const { winningEntry, rotation } = calculateWheelSpin(
+    wheelEntries,
+    wheelState$.rotation.peek(),
   );
+  wheelState$.winningEntry.set(winningEntry);
+  wheelState$.rotation.set(rotation);
   wheelState$.isRotating.set(true);
   setTimeout(() => {
     setIsWinner(winningEntry.id, true);
     open();
     fireworks();
     wheelState$.isRotating.set(false);
-  }, 10200);
+  }, SPIN_COMPLETION_DELAY);
 }
 
 function getRandomFloat(min: number, max: number) {

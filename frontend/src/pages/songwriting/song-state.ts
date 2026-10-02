@@ -1,4 +1,10 @@
-import type { EntryProps } from "@shared/types";
+import { entriesFor } from "../../components/wheel/wheel-entries.ts";
+import {
+  resetWheelForEntries,
+  restoreWheelState,
+} from "../../components/wheel/wheel-position.ts";
+import { createWheelState } from "../../components/wheel-spinner/wheel-state.ts";
+import type { WheelState } from "../../components/wheel-spinner/wheel-state.ts";
 
 export const WHEEL_IDS = ["scale", "note", "instrument", "tempo"] as const;
 export type WheelId = (typeof WHEEL_IDS)[number];
@@ -32,7 +38,6 @@ export const TITLES: Record<WheelId, string> = {
   tempo: "Tempo",
 };
 export const STORAGE_KEY = "song-wheels-v1";
-export const SPIN_DURATION = 3000;
 
 export interface Settings {
   scales: string[];
@@ -40,12 +45,6 @@ export interface Settings {
   instruments: string[];
   minTempo: number;
   maxTempo: number;
-}
-export interface WheelState {
-  result: string | null;
-  locked: boolean;
-  rotation: number;
-  spinning: boolean;
 }
 export type Wheels = Record<WheelId, WheelState>;
 export interface SongState {
@@ -79,39 +78,10 @@ export function choicesFor(id: WheelId, settings: Settings): string[] {
   }
 }
 
-export function entriesFor(choices: string[]): EntryProps[] {
-  return choices.map((text) => ({
-    id: text,
-    text,
-    author: "",
-    isSafe: true,
-    isOnWheel: true,
-    weight: 1,
-  }));
-}
-
 export function initialWheels(): Wheels {
   return Object.fromEntries(
-    WHEEL_IDS.map((id) => [
-      id,
-      { result: null, locked: false, rotation: 0, spinning: false },
-    ]),
+    WHEEL_IDS.map((id) => [id, createWheelState()]),
   ) as Wheels;
-}
-
-export function spinResult(
-  choices: string[],
-  rotation: number,
-  random = Math.random,
-): { result: string; rotation: number } {
-  if (!choices.length) throw new Error("A wheel needs at least one choice.");
-  const index = Math.floor(random() * choices.length);
-  // Slices begin at the pointer on the right. Align the chosen slice's center.
-  const angle = ((index + 0.5) / choices.length) * 360;
-  return {
-    result: choices[index],
-    rotation: rotation + (360 - (rotation % 360)) + 4 * 360 + angle,
-  };
 }
 
 export function settingsError(settings: Settings): string | null {
@@ -152,7 +122,7 @@ export function restoreState(raw: string | null): SongState {
     const saved = JSON.parse(raw);
     const settings = saved.settings;
     if (
-      saved.version !== 1 ||
+      (saved.version !== 1 && saved.version !== 2) ||
       !settings ||
       !validChoices(settings.scales, SCALES) ||
       !validChoices(settings.notes, NOTES) ||
@@ -162,16 +132,10 @@ export function restoreState(raw: string | null): SongState {
       return fallback;
     const wheels = initialWheels();
     for (const id of WHEEL_IDS) {
-      const result = saved.wheels?.[id]?.result;
-      const choices = choicesFor(id, settings);
-      const index = choices.indexOf(result);
-      if (index >= 0)
-        wheels[id] = {
-          result,
-          locked: saved.wheels[id].locked === true,
-          spinning: false,
-          rotation: ((index + 0.5) / choices.length) * 360,
-        };
+      wheels[id] = restoreWheelState(
+        saved.wheels?.[id],
+        entriesFor(choicesFor(id, settings)),
+      );
     }
     return { settings, wheels };
   } catch {
@@ -179,34 +143,43 @@ export function restoreState(raw: string | null): SongState {
   }
 }
 
-export function serializeState(state: SongState): string {
-  return JSON.stringify({
-    version: 1,
-    settings: state.settings,
+export function snapshotState(state: SongState) {
+  return {
+    version: 2,
+    settings: structuredClone(state.settings),
     wheels: Object.fromEntries(
       WHEEL_IDS.map((id) => [
         id,
-        { result: state.wheels[id].result, locked: state.wheels[id].locked },
+        {
+          result: state.wheels[id].winningEntry?.id ?? null,
+          locked: state.wheels[id].locked,
+          rotation: state.wheels[id].rotation,
+        },
       ]),
     ),
-  });
+  };
+}
+
+export function serializeState(state: SongState): string {
+  return JSON.stringify(snapshotState(state));
 }
 
 export function applySettings(state: SongState, settings: Settings): SongState {
   const wheels = initialWheels();
   for (const id of WHEEL_IDS) {
-    const choices = choicesFor(id, settings);
-    const index = choices.indexOf(state.wheels[id].result ?? "");
-    if (index >= 0)
-      wheels[id] = {
-        ...state.wheels[id],
-        rotation: ((index + 0.5) / choices.length) * 360,
-      };
+    const previousChoices = choicesFor(id, state.settings);
+    const nextChoices = choicesFor(id, settings);
+    const unchanged =
+      previousChoices.length === nextChoices.length &&
+      previousChoices.every((choice, index) => choice === nextChoices[index]);
+    wheels[id] = unchanged
+      ? state.wheels[id]
+      : resetWheelForEntries(state.wheels[id], entriesFor(nextChoices));
   }
   return { settings, wheels };
 }
 
 export function songPrompt(wheels: Wheels): string | null {
-  if (!WHEEL_IDS.every((id) => wheels[id].result !== null)) return null;
-  return `${wheels.note.result} ${wheels.scale.result} · ${wheels.instrument.result} · ${wheels.tempo.result} BPM`;
+  if (!WHEEL_IDS.every((id) => wheels[id].winningEntry !== null)) return null;
+  return `${wheels.note.winningEntry?.text} ${wheels.scale.winningEntry?.text} · ${wheels.instrument.winningEntry?.text} · ${wheels.tempo.winningEntry?.text} BPM`;
 }
