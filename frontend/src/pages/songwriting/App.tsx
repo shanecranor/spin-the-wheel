@@ -8,6 +8,7 @@ import { choicesFor, songPrompt, TITLES, WHEEL_IDS } from "./song-state";
 import { SongSettingsModal } from "./song-settings-modal";
 import { songStore as store } from "./song-store";
 import styles from "./songwriting.module.scss";
+import { PracticeTimers } from "./practice/practice-timers";
 
 const App = observer(() => {
   const reducedMotion =
@@ -97,6 +98,7 @@ const App = observer(() => {
             ? "Browser storage is unavailable. Settings won’t survive a reload."
             : "")}
       </Text>
+      <PracticeTimers getSong={() => store.state$.peek()} />
       {settingsOpen && (
         <SongSettingsModal
           settings={settings}
