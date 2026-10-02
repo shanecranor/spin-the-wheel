@@ -149,7 +149,7 @@ export default function App() {
       await navigator.clipboard.writeText(prompt);
       setCopyStatus("Copied");
     } catch {
-      setCopyStatus("Couldn’t copy. Select the result to copy it.");
+      setCopyStatus("Couldn't copy. Select the result to copy it.");
     }
   }
 
@@ -321,7 +321,7 @@ export default function App() {
               />
             </Group>
             <Text size="sm" c="dimmed" mt="xs">
-              40–240 BPM, in steps of 5.
+              40-240 BPM, in steps of 5.
             </Text>
           </fieldset>
           {draftError && (
