@@ -28,7 +28,7 @@ import {
   TITLES,
   WHEEL_IDS,
 } from "./song-state";
-import type { Settings, SongState, WheelId } from "./song-state";
+import type { Settings, SongState, WheelId, WheelState } from "./song-state";
 import styles from "./songwriting.module.scss";
 
 function loadState(): SongState {
@@ -65,6 +65,17 @@ export default function App() {
     setCopyStatus("");
   }
 
+  function updateWheel(id: WheelId, changes: Partial<WheelState>) {
+    const current = stateRef.current;
+    update({
+      ...current,
+      wheels: {
+        ...current.wheels,
+        [id]: { ...current.wheels[id], ...changes },
+      },
+    });
+  }
+
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, serializeState(state));
@@ -98,35 +109,21 @@ export default function App() {
         spinning: duration > 0,
         result: duration ? wheel.result : chosen.result,
       };
-      if (duration)
+      if (duration) {
         timers.current[id] = setTimeout(() => {
-          const latest = stateRef.current;
-          update({
-            ...latest,
-            wheels: {
-              ...latest.wheels,
-              [id]: {
-                ...latest.wheels[id],
-                spinning: false,
-                result: chosen.result,
-              },
-            },
+          updateWheel(id, {
+            spinning: false,
+            result: chosen.result,
           });
           delete timers.current[id];
         }, duration);
+      }
     }
     update(next);
   }
 
   function toggleLock(id: WheelId) {
-    const current = stateRef.current;
-    update({
-      ...current,
-      wheels: {
-        ...current.wheels,
-        [id]: { ...current.wheels[id], locked: !current.wheels[id].locked },
-      },
-    });
+    updateWheel(id, { locked: !stateRef.current.wheels[id].locked });
   }
 
   function toggleChoice(
