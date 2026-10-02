@@ -49,6 +49,7 @@ const pink: MantineColorsTuple = [
   "#a90053",
 ];
 export const theme = createTheme({
+  defaultRadius: "sm",
   primaryColor: "pink",
   primaryShade: 4,
   white: "#fff",

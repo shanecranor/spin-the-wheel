@@ -1,4 +1,5 @@
 import { observable } from "@legendapp/state";
+import type { ObservablePrimitiveBaseFns } from "@legendapp/state";
 
 export function getRandomInt() {
   const buffer = new Uint32Array(1);
@@ -24,12 +25,12 @@ interface SpecObservable<T> {
 
 export function fromSpecObservable<T = unknown>(
   specObservable: SpecObservable<T>,
-  initialValue?: T
+  initialValue?: T,
 ) {
   const obs$ = observable<T>(initialValue);
   specObservable.subscribe({
     next: (value) => {
-      obs$.set(() => value);
+      (obs$ as ObservablePrimitiveBaseFns<T>).set(() => value);
     },
     error: () => void null,
     complete: () => void null,

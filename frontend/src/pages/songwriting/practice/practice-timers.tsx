@@ -156,12 +156,12 @@ const PracticeTimer = observer(
 );
 
 export function PracticeTimers({ getSong }: { getSong: () => SongState }) {
-  const player = useRef<ChiptunePlayer>();
+  const player = useRef<ChiptunePlayer>(undefined);
   if (!player.current) player.current = new ChiptunePlayer();
   const [playing, setPlaying] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [status, setStatus] = useState("");
-  const endTimer = useRef<ReturnType<typeof setTimeout>>();
+  const endTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const mounted = useRef(false);
   const generation = useRef(0);
 

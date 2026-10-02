@@ -5,13 +5,12 @@ import "@mantine/core/styles.layer.css";
 import "./index.css";
 import { theme } from "./src/theme";
 
-import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <ColorSchemeScript forceColorScheme="dark" />
     <MantineProvider theme={theme} forceColorScheme="dark">
       <App />
     </MantineProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

@@ -25,6 +25,8 @@ so they catch up when the page becomes active. Timers reset on page reload.
 
 ## Development
 
+Requires Node 22.18 or newer. Yarn 4.18.1 is pinned in `package.json`.
+
 From this directory, install the versions in `yarn.lock` and start Vite:
 
 ```sh
@@ -36,10 +38,11 @@ The app runs entirely in the browser and needs no backend or account.
 
 ```sh
 yarn build
+yarn lint
+yarn test
 ```
 
-The state and selection tests use the built-in Node test runner and TypeScript
-support (Node 22.18 or newer):
+
 
 ```sh
 node --test tests/*.test.ts
