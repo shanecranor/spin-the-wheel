@@ -9,9 +9,17 @@ interface WheelProps {
   wheelEntries: EntryProps[];
   rotation: number;
   emptyState?: React.ReactNode;
+  compact?: boolean;
+  spinDuration?: number;
 }
 export const Wheel = observer(
-  ({ wheelEntries, rotation, emptyState }: WheelProps) => {
+  ({
+    wheelEntries,
+    rotation,
+    emptyState,
+    compact = false,
+    spinDuration = 10000,
+  }: WheelProps) => {
     const wheelOffsets = buildWheelOffsets(wheelEntries);
     const svgMarkup = buildWheelSVG(wheelEntries);
     const base64SVG = btoa(svgMarkup);
@@ -27,22 +35,29 @@ export const Wheel = observer(
     return (
       <>
         <div
-          className={styles["c-wheel"]}
+          className={`${styles["c-wheel"]} ${compact ? styles.compact : ""}`}
           style={{
             background: backgroundImage,
             transform: `rotate(${rotation * -1}deg)`,
-            transition: "transform 10s cubic-bezier(.08,.49,0,1)",
+            transition: `transform ${spinDuration}ms cubic-bezier(.08,.49,0,1)`,
           }}
         >
           <div className={styles["slices-container"]}>
             {wheelEntries.map((slice, idx) => {
               const rotation = wheelOffsets[idx].mid * 360;
               const j = largestFontSize - smallestFontSize;
-              const fontSize =
-                Math.min(
-                  45,
-                  j * (j / (slice.text.length + j)) + smallestFontSize
-                ) * Math.min(window.innerWidth / 1920 * 3, 1) + "px"; //little bit hacky, only updates on remount
+              const fontSize = compact
+                ? wheelEntries.length > 16
+                  ? "11px"
+                  : slice.text.length > 12
+                    ? "12px"
+                    : "14px"
+                : Math.min(
+                    45,
+                    j * (j / (slice.text.length + j)) + smallestFontSize,
+                  ) *
+                    Math.min((window.innerWidth / 1920) * 3, 1) +
+                  "px"; //little bit hacky, only updates on remount
               return (
                 <SliceText key={slice.id} rotation={rotation}>
                   <Tooltip label={slice.text} color="dark">
@@ -57,5 +72,5 @@ export const Wheel = observer(
         </div>
       </>
     );
-  }
+  },
 );

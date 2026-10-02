@@ -22,6 +22,15 @@
   }
 }
 
+.compact .slices-container {
+  width: 50%;
+}
+
+.compact .slices-container > div > div {
+  padding-left: 8px;
+  margin-right: 14px;
+}
+
 //create a temporary spinning animation
 @keyframes spin {
   0% {

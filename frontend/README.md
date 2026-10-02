@@ -1,30 +1,29 @@
-# React + TypeScript + Vite
+# Song wheels
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Four independent wheels for the root note, scale, instrument, and tempo of a song.
+Spin a wheel or all unlocked wheels, lock results you want to keep, and copy
+the combined result (for example, `C major · Guitar · 105 BPM`). Settings
+control the available choices and tempo range. Settings, results, and locks
+are saved in this browser.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+From this directory, install the versions in `yarn.lock` and start Vite:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+```sh
+yarn install --immutable
+yarn dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+The app runs entirely in the browser and needs no backend or account.
+
+```sh
+yarn build
+```
+
+The state and selection tests use the built-in Node test runner and TypeScript
+support (Node 22.18 or newer):
+
+```sh
+node --test tests/song-state.test.ts
+```
