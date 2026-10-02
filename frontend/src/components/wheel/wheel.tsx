@@ -24,8 +24,6 @@ export const Wheel = observer(
     const svgMarkup = buildWheelSVG(wheelEntries);
     const base64SVG = btoa(svgMarkup);
     const backgroundImage = `url('data:image/svg+xml;base64,${base64SVG}')`;
-    const largestFontSize = 27;
-    const smallestFontSize = 16;
     if (wheelEntries.length === 0)
       return (
         <div className={styles["c-wheel"]}>
@@ -45,19 +43,11 @@ export const Wheel = observer(
           <div className={styles["slices-container"]}>
             {wheelEntries.map((slice, idx) => {
               const rotation = wheelOffsets[idx].mid * 360;
-              const j = largestFontSize - smallestFontSize;
-              const fontSize = compact
-                ? wheelEntries.length > 16
-                  ? "11px"
-                  : slice.text.length > 12
-                    ? "12px"
-                    : "14px"
-                : Math.min(
-                    45,
-                    j * (j / (slice.text.length + j)) + smallestFontSize,
-                  ) *
-                    Math.min((window.innerWidth / 1920) * 3, 1) +
-                  "px"; //little bit hacky, only updates on remount
+              const fontSize = getSliceFontSize(
+                slice.text,
+                wheelEntries.length,
+                compact,
+              );
               return (
                 <SliceText key={slice.id} rotation={rotation}>
                   <Tooltip label={slice.text} color="dark">
@@ -74,3 +64,26 @@ export const Wheel = observer(
     );
   },
 );
+
+function getSliceFontSize(
+  text: string,
+  entryCount: number,
+  compact: boolean,
+): string {
+  if (compact) {
+    if (entryCount > 16) return "11px";
+    if (text.length > 12) return "12px";
+    return "14px";
+  }
+
+  const largestFontSize = 27;
+  const smallestFontSize = 16;
+  const fontSizeRange = largestFontSize - smallestFontSize;
+  const fontSize = Math.min(
+    45,
+    fontSizeRange * (fontSizeRange / (text.length + fontSizeRange)) +
+      smallestFontSize,
+  );
+  const viewportScale = Math.min((window.innerWidth / 1920) * 3, 1);
+  return `${fontSize * viewportScale}px`;
+}
